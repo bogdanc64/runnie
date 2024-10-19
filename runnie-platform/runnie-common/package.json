@@ -1,0 +1,23 @@
+{
+  "name": "runnie-common",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "compile": "tsc",
+    "remove-build-files": "rimraf dist",
+    "pack": "npm pack && ./scripts/move-package.sh",
+    "build": "npm run compile && npm run pack && npm run remove-build-files"
+  },
+  "files": [
+    "*.js",
+    "*.ts",
+    "*.d.ts",
+    "dist/**/*.ts",
+    "dist/**/*.js",
+    "dist/**/*.d.ts"
+  ],
+  "devDependencies": {
+    "rimraf": "^6.0.1"
+  }
+}
