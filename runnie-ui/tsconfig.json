@@ -16,6 +16,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": [
+      "chrome"
+    ]
   }
 }

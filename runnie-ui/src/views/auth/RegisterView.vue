@@ -11,7 +11,7 @@
   import { required, email, sameAs, minLength } from "@vuelidate/validators";
   import { createThresholdValidator } from "@/lib/validators";
   import { useLoadingStore } from "@/store/loading";
-  import { notify } from "@/services/toast.service";
+  import { notifySuccess } from "@/services/toast.service";
   import { useVuelidate } from "@vuelidate/core";
   import PasswordStrengthMeter from "@/components/shared/PasswordStrengthMeter.vue";
   import zxcvbn from "zxcvbn";
@@ -64,11 +64,7 @@
         return;
       }
 
-      notify(
-        "Success",
-        "Your account has been created successfully. Please verify your email to confirm your account.",
-        "mdi:success-circle"
-      );
+      notifySuccess("Your account has been created successfully. Please verify your email to confirm your account.");
       navigateToSignIn();
     } catch (error) {
       formData.showError = true;

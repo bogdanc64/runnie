@@ -2,7 +2,7 @@
   import { AlertCircle } from "lucide-vue-next";
   import type { HTMLAttributes } from "vue";
   import { type AlertVariants, alertVariants } from ".";
-  import { cn } from "@/lib/utils";
+  import { cn } from "@/lib/utils/class.utils";
 
   const props = defineProps<{
     class?: HTMLAttributes["class"];

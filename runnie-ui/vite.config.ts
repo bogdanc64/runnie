@@ -13,6 +13,9 @@ export default defineConfig({
       plugins: [tailwind(), autoprefixer()],
     },
   },
+  define: {
+    'window.chrome': 'chrome',
+  },
   plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {

@@ -4,6 +4,8 @@ import { User, UserStatus } from "./src/models/user";
 import { Model } from "./src/models/model";
 import { Role, UserRoles } from "./src/models/role";
 import { Permission, PermissionAction, PermissionResource } from "./src/models/permission";
+import { ExtensionMessage } from "./src/models/extension";
+import { StartTestPayload, Test } from "./src/models/tests";
 
 export {
     ApiClient,
@@ -17,5 +19,8 @@ export {
     PermissionAction,
     PermissionResource,
     UserStatus,
-    UserRoles
+    UserRoles,
+    ExtensionMessage,
+    Test,
+    StartTestPayload
 };
