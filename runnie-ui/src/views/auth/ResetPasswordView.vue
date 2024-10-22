@@ -4,7 +4,7 @@
   import { Input } from "@/components/ui/input";
   import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
   import { Label } from "@/components/ui/label";
-  import { notify } from "@/services/toast.service";
+  import { notifySuccess } from "@/services/toast.service";
   import { required, sameAs } from "@vuelidate/validators";
   import { createThresholdValidator } from "@/lib/validators";
   import { useAuthStore } from "@/store/auth";
@@ -66,7 +66,7 @@
         return;
       }
 
-      notify("Success", "The password has been resetted successfully.", "mdi:success-circle");
+      notifySuccess("The password has been resetted successfully.");
 
       navigateToSignIn();
     } catch (error) {

@@ -9,7 +9,7 @@
   import { email, required } from "@vuelidate/validators";
   import useVuelidate from "@vuelidate/core";
   import { useAuthStore } from "@/store/auth";
-  import { notify } from "@/services/toast.service";
+  import { notifySuccess } from "@/services/toast.service";
   import { useLoadingStore } from "@/store/loading";
 
   const router = useRouter();
@@ -41,10 +41,8 @@
         return;
       }
 
-      notify(
-        "Success",
-        "Your reset password request has been sent successfully. If you have an account linked with the provided email, you will receive an email for resetting your password.",
-        "mdi:success-circle"
+      notifySuccess(
+        "Your reset password request has been sent successfully. If you have an account linked with the provided email, you will receive an email for resetting your password."
       );
       navigateToSignIn();
     } catch (error) {

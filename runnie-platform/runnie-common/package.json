@@ -7,7 +7,8 @@
     "compile": "tsc",
     "remove-build-files": "rimraf dist",
     "pack": "npm pack && ./scripts/move-package.sh",
-    "build": "npm run compile && npm run pack && npm run remove-build-files"
+    "install-in-all-projects": "./scripts/install-in-all-projects.sh",
+    "build": "npm run compile && npm run pack && npm run remove-build-files && npm run install-in-all-projects"
   },
   "files": [
     "*.js",

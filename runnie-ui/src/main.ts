@@ -9,8 +9,6 @@ import { getConfig } from "./config";
 import { ApiClient } from "runnie-common";
 import { registerServices } from "./services";
 
-const app = createApp(App);
-
 const host = window.location.hostname;
 if (host === "localhost") {
   window.addEventListener("error", (event) => {
@@ -25,12 +23,14 @@ if (host === "localhost") {
 const config = getConfig();
 const apiClient = new ApiClient(config.apiURL);
 
+const pinia = createPinia();
+pinia.use(({ store }) => store.apiClient = apiClient)
+
+const app = createApp(App);
 registerServices(app, {
   apiClient,
 });
 
-const pinia = createPinia();
-pinia.use(({ store }) => store.apiClient = apiClient)
 app.use(pinia);
 app.use(router);
 

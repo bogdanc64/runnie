@@ -14,7 +14,7 @@ const DefaultState: AuthState = {
 }
 
 export const useAuthStore = defineStore("auth", {
-  state: () => ({...DefaultState}),
+  state: () => ({ ...DefaultState }),
 
   getters: {
     getFullName(): string {

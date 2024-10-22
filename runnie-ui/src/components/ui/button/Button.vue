@@ -3,7 +3,7 @@
   import { Primitive, type PrimitiveProps } from "radix-vue";
   import { type ButtonVariants, buttonVariants } from ".";
   import { Loader2 } from "lucide-vue-next";
-  import { cn } from "@/lib/utils";
+  import { cn } from "@/lib/utils/class.utils";
 
   interface Props extends PrimitiveProps {
     variant?: ButtonVariants["variant"];

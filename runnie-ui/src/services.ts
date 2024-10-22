@@ -11,8 +11,3 @@ export const registerServices = (app: App, services: Services) => {
     app.provide(key, service);
   }
 };
-
-// Type augmentation for global properties
-declare module '@vue/runtime-core' {
-  interface ComponentCustomProperties extends Services {}
-}
