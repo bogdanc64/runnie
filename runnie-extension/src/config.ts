@@ -6,5 +6,6 @@ export const config = {
         defaultVisibility: false,
         containerId: `${packageJSON.name}-floating`,
         draggableZoneId: `${packageJSON.name}-drag-zone`
-    }
+    },
+    frontendOrigin: import.meta.env.VITE_FRONTEND_ORIGIN
 }

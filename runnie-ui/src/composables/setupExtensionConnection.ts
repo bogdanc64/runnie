@@ -5,7 +5,7 @@ import { handleExtensionMessage } from "@/services/message.service";
 import { isDeviceSupported } from "@/lib/utils/browser.util";
 
 const MAX_RETRIES = 5;
-const TIME_BETWEEN_RETRIES = 5 * 1000;
+const TIME_BETWEEN_RETRIES = 2 * 1000;
 
 export function setupExtensionConnection() {
     const store = useExtensionStore();
@@ -44,9 +44,9 @@ export function setupExtensionConnection() {
 
     const startPingExtension = () => {
         pingInterval = setInterval(() => {
-            if (pingRetries === MAX_RETRIES) {
+            if (pingRetries === MAX_RETRIES - 1) {
                 stopPinging();
-                store.setExtensionStatus(false)
+                store.disconnectFromExtension();
             };
 
             store.pingExtension();

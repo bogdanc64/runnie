@@ -1,6 +1,6 @@
 import { useExtensionStore } from "@/store/extension";
-import type { ExtensionMessage } from "runnie-common";
-import { ExtensionMessageType } from "runnie-common/dist/src/models/extension";
+import type { ExtensionMessage, ExtensionSettings } from "runnie-common";
+import { ExtensionExternalMessageType } from "runnie-common/dist/src/models/extension";
 
 export const sendMessageToExtension = (message: ExtensionMessage) => {
     window.postMessage({ ...message, isRunnieEvent: true, isWebAppSource: true }, '*');
@@ -8,15 +8,21 @@ export const sendMessageToExtension = (message: ExtensionMessage) => {
 
 export const handleExtensionMessage = (message: ExtensionMessage) => {
     const handler = ExtensionMessageHandlers[message.type];
-    handler ? handler() : console.warn(`No handler found for message type: ${message.type}`);
+    handler ? handler(message) : console.warn(`No handler found for message type: ${message.type}`);
 }
 
-export const ExtensionMessageHandlers: Partial<Record<ExtensionMessageType, () => void>> = {
-    [ExtensionMessageType.CONNECT_TO_WEBAPP]: () => {
+export const ExtensionMessageHandlers: Partial<Record<ExtensionExternalMessageType, (message: ExtensionMessage) => void>> = {
+    [ExtensionExternalMessageType.CONNECT_TO_WEBAPP]: (message: ExtensionMessage) => {
+        const settings = message.payload as ExtensionSettings;
+        
         const extensionStore = useExtensionStore();
-        extensionStore.setExtensionStatus(true);
+        
+        extensionStore.setExtensionSettings(settings);
+        if (!extensionStore.isConnected) {
+            extensionStore.setExtensionStatus(true);
+        }
     },
-    [ExtensionMessageType.PONG_WEBAPP]: () => {
+    [ExtensionExternalMessageType.PONG_WEBAPP]: () => {
         console.debug('Received pong from extension.');
     },
 }

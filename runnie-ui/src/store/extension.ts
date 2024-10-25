@@ -1,23 +1,40 @@
 import { sendMessageToExtension } from "@/services/message.service";
 import { notifyError, notifySuccess } from "@/services/toast.service";
 import { defineStore } from "pinia";
-import { ExtensionMessageType } from "runnie-common/dist/src/models/extension";
+import { ExtensionExternalMessageType, type ExtensionSettings } from "runnie-common";
 
 interface ExtensionState {
     isConnected: boolean,
+    settings: ExtensionSettings | null
 }
 
 const DefaultState: ExtensionState = {
     isConnected: false,
+    settings: null,
 }
 
 export const useExtensionStore = defineStore("extension", {
     state: () => ({ ...DefaultState }),
 
+    getters: {
+        isPreparedForTesting: (state) => state.isConnected && state.settings?.isAllowedInIncognito,
+    },
+
     actions: {
+        disconnectFromExtension() {
+            this.setExtensionSettings(null);
+            this.setExtensionStatus(false)
+        },
+        setExtensionSettings(settings: ExtensionSettings | null) {
+            this.settings = settings;
+
+            if (settings) {
+                checkExtensionSettings(settings);
+            }
+        },
         setExtensionStatus(connected: boolean) {
             this.isConnected = connected;
-            
+
             if (connected) {
                 notifySuccess(
                     "Connected to Runnie. You can now use Runnie in your browser"
@@ -29,7 +46,15 @@ export const useExtensionStore = defineStore("extension", {
             }
         },
         pingExtension() {
-            sendMessageToExtension({ type: ExtensionMessageType.PING_EXTENSION });
+            sendMessageToExtension({ type: ExtensionExternalMessageType.PING_EXTENSION });
         }
     },
 });
+
+const checkExtensionSettings = (settings: ExtensionSettings) => {
+    if (!settings.isAllowedInIncognito) {
+        notifyError(
+            "The extension is not allowed in incognito mode. Please allow the extension to run in incognito.",
+        );
+    }
+};
