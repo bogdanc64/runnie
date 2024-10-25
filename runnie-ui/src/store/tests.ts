@@ -1,6 +1,6 @@
 import { sendMessageToExtension } from "@/services/message.service";
 import { defineStore } from "pinia";
-import { ExtensionMessageType } from "runnie-common/dist/src/models/extension";
+import { ExtensionExternalMessageType } from "runnie-common";
 import type { Test, StartTestPayload } from "runnie-common";
 
 interface TestsState {
@@ -23,7 +23,7 @@ export const useTestsStore = defineStore("tests", {
 
                 } as Test
             } as StartTestPayload;
-            sendMessageToExtension({ type: ExtensionMessageType.START_TEST, payload })
+            sendMessageToExtension({ type: ExtensionExternalMessageType.START_TEST, payload })
         }
     },
 });

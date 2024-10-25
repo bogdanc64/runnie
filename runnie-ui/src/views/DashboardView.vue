@@ -18,7 +18,9 @@
         <h1 class="text-lg font-semibold md:text-2xl">Dashboard</h1>
       </div>
       <div class="flex px-6 py-4">
-        <Button :disabled="!extensionStore.isConnected" variant="outline" @click="startTest">Start test</Button>
+        <Button :disabled="!extensionStore.isPreparedForTesting" variant="outline" @click="startTest">
+          Start test
+        </Button>
       </div>
     </div>
   </main>
