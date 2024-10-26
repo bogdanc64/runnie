@@ -1,15 +1,8 @@
 import { ExtensionComponents } from "@/common/constants";
-import { OpenBrowserPayload } from "@/common/types";
+import { InternalExtensionActions } from "@/common/internal-actions";
 import { config } from "@/config";
-import { ExtensionSettings } from "runnie-common";
+import { ExtensionSettings, StartTestPayload } from "runnie-common";
 import { sendMessage } from "webext-bridge/background";
-
-export enum ExtensionActionsIdentifiers {
-    SetupExtension = 'setup-extension',
-    ConnectToWebApp = 'connect-to-web-app',
-    OpenDebuggerWindow = 'open-debugger-window',
-    MountFloatingExtension = 'mount-floating-extension',
-}
 
 export const setupExtension = async () => {
   const extensionSettings = {} as ExtensionSettings;
@@ -23,14 +16,14 @@ export const setupExtension = async () => {
   }
 
   sendMessage(
-    ExtensionActionsIdentifiers.ConnectToWebApp,
+    InternalExtensionActions.ConnectToWebApp,
     { ...extensionSettings },
     { context: ExtensionComponents.ContentScript, tabId }
   )
 }
 
-export const openDebuggerWindow = async (message: OpenBrowserPayload) => {
-    const url = message.URL;
+export const prepareTestingEnvironment = async (message: StartTestPayload) => {
+    const url = message.selectedTest.URL;
   
     if (!url) {
       return { success: false, error: 'No URL provided' };
@@ -51,15 +44,17 @@ export const openDebuggerWindow = async (message: OpenBrowserPayload) => {
       const debuggee = { tabId: newTabId };
       await chrome.debugger.attach(debuggee, '1.3');
       
+      addReinjectFloatingListener(newTabId);      
+
       await sendMessage(
-        ExtensionActionsIdentifiers.MountFloatingExtension, 
-        {}, 
+        InternalExtensionActions.MountFloatingExtension, 
+        null, 
         { context: ExtensionComponents.ContentScript, tabId: newTabId }
       );
   
-      return { success: true, windowId: newWindow.id };
+      return { success: true, tabId: newTabId };
     } catch (error) {
-      console.error('Error in open-debugger-window:', error);
+      console.error('Error in prepare-testing-environment:', error);
       return { success: false, error: error };
     }
 }
@@ -78,3 +73,15 @@ const returnWebAppTabId = async(): Promise<number | null> => {
     return null;
   }
 } 
+
+const addReinjectFloatingListener = (newTabId: number) => {
+  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
+    if (tabId === newTabId && changeInfo.status === 'complete') {
+      sendMessage(
+        InternalExtensionActions.MountFloatingExtension, 
+        null, 
+        { context: ExtensionComponents.ContentScript, tabId: newTabId }
+      );
+    }
+  });
+}
