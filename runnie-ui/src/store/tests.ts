@@ -20,7 +20,13 @@ export const useTestsStore = defineStore("tests", {
                 selectedTest: {
                     id: 1,
                     URL: "https://emag.ro",
-
+                    steps: [{
+                        action: "left-click",
+                        identifier: "//*[@id=\"auxiliary\"]/div/div/ul[2]/li[3]/a"
+                    },{
+                        action: "left-click",
+                        identifier: "//*[@id=\"cp_widget_63464\"]/div/div[2]/div[1]/a"
+                    }]
                 } as Test
             } as StartTestPayload;
             sendMessageToExtension({ type: ExtensionExternalMessageType.START_TEST, payload })

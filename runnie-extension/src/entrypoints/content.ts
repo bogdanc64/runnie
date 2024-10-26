@@ -1,34 +1,30 @@
 import { ContentScriptContext } from 'wxt/client';
 import { onMessage, sendMessage } from "webext-bridge/content-script";
-import { ExtensionActionsIdentifiers } from "@/units/extension";
 import { handleExternalMessage, sendMessageToWebApp } from "@/services/external-message.service";
 import { ExtensionExternalMessageType, ExtensionMessage, ExtensionSettings } from "runnie-common";
 import { mountFloatingExtension } from "./floating/main";
 import { ExtensionComponents } from '@/common/constants';
 import { config } from '@/config';
 import { BridgeMessage } from 'webext-bridge';
+import { InternalExtensionActions } from '@/common/internal-actions';
+import { runStep } from '@/units/runner';
 
 export default defineContentScript({
   matches: ['<all_urls>'],
   cssInjectionMode: 'ui',
 
   async main(context) {
-    pingBackgroundToSetupExtension();
+    sendMessage(InternalExtensionActions.SetupExtension, null, ExtensionComponents.Background);
     defineInternalMessageHandlers(context);
   },
 });
 
 const defineInternalMessageHandlers = (context: ContentScriptContext) => {
-  onMessage(ExtensionActionsIdentifiers.ConnectToWebApp, async (message: BridgeMessage<any>) => await connectToWebApp(message.data as ExtensionSettings | null));  
-  onMessage(ExtensionActionsIdentifiers.MountFloatingExtension, async () => await mountFloatingExtension(context));
-}
-
-const pingBackgroundToSetupExtension = () => {
-  sendMessage(
-    ExtensionActionsIdentifiers.SetupExtension,
-    {},
-    ExtensionComponents.Background
-  )
+  onMessage(InternalExtensionActions.ConnectToWebApp, async (message: BridgeMessage<any>) => await connectToWebApp(message.data));  
+  
+  // Handlers for testing browser instance
+  onMessage(InternalExtensionActions.MountFloatingExtension, async () => await mountFloatingExtension(context));
+  onMessage(InternalExtensionActions.RunStep, async (step: BridgeMessage<any>) => await runStep(step.data));
 }
 
 const connectToWebApp = async (settings: ExtensionSettings | null) => {

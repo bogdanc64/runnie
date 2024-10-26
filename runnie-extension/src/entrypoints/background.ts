@@ -1,15 +1,15 @@
-import { OpenBrowserPayload } from '@/common/types';
 import { onMessage } from 'webext-bridge/background'
-import { openDebuggerWindow, ExtensionActionsIdentifiers, setupExtension } from '@/units/extension';
+import { prepareTestingEnvironment, setupExtension } from '@/units/extension';
+import { InternalExtensionActions } from '@/common/internal-actions';
 
 export default defineBackground(() => {
   defineInternalMessageHandlers();
 })
 
 const defineInternalMessageHandlers = () => {
-  onMessage(ExtensionActionsIdentifiers.SetupExtension, async () => await setupExtension());
+  onMessage(InternalExtensionActions.SetupExtension, async () => await setupExtension());
   onMessage(
-    ExtensionActionsIdentifiers.OpenDebuggerWindow,
-    async (message) => await openDebuggerWindow(message.data as OpenBrowserPayload)
+    InternalExtensionActions.PrepareTestingEnvironment,
+    async (message) => await prepareTestingEnvironment(message.data as any)
   );
 }
