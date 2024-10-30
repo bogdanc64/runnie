@@ -3,19 +3,20 @@ import { InternalExtensionActions } from "@/common/internal-actions";
 import { config } from "@/config";
 import { ExtensionSettings, StartTestPayload } from "runnie-common";
 import { sendMessage } from "webext-bridge/background";
+import { getStore } from "../store";
 
 export const setupExtension = async () => {
   const extensionSettings = {} as ExtensionSettings;
 
   extensionSettings.isAllowedInIncognito = await chrome.extension.isAllowedIncognitoAccess();
-  const tabId = await returnWebAppTabId();
+  const tabId = await retrieveWebAppTabId();
 
   if (tabId === null) {
     console.error("Web app is not opened.");
     return;
   }
 
-  sendMessage(
+  await sendMessage(
     InternalExtensionActions.ConnectToWebApp,
     { ...extensionSettings },
     { context: ExtensionComponents.ContentScript, tabId }
@@ -43,15 +44,10 @@ export const prepareTestingEnvironment = async (message: StartTestPayload) => {
   
       const debuggee = { tabId: newTabId };
       await chrome.debugger.attach(debuggee, '1.3');
-      
-      addReinjectFloatingListener(newTabId);      
 
-      await sendMessage(
-        InternalExtensionActions.MountFloatingExtension, 
-        null, 
-        { context: ExtensionComponents.ContentScript, tabId: newTabId }
-      );
-  
+      addReinjectFloatingListener(newTabId);
+      addSuspendListener(newTabId);
+
       return { success: true, tabId: newTabId };
     } catch (error) {
       console.error('Error in prepare-testing-environment:', error);
@@ -59,14 +55,12 @@ export const prepareTestingEnvironment = async (message: StartTestPayload) => {
     }
 }
 
-const returnWebAppTabId = async(): Promise<number | null> => {
+const retrieveWebAppTabId = async(): Promise<number | null> => {
   const domain = config.frontendOrigin; 
   
   try {
     const tabs = await chrome.tabs.query({});
-    const matchingTab = tabs.find(tab => 
-      tab.url && tab.url.includes(domain)
-    );
+    const matchingTab = tabs.find(tab => tab.url?.includes(domain));
     return matchingTab?.id ?? null;
   } catch (error) {
     console.error('Error checking for tab:', error);
@@ -75,13 +69,28 @@ const returnWebAppTabId = async(): Promise<number | null> => {
 } 
 
 const addReinjectFloatingListener = (newTabId: number) => {
-  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo) {
-    if (tabId === newTabId && changeInfo.status === 'complete') {
-      sendMessage(
-        InternalExtensionActions.MountFloatingExtension, 
-        null, 
-        { context: ExtensionComponents.ContentScript, tabId: newTabId }
-      );
+  chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
+    if (tabId !== newTabId || changeInfo.status !== 'complete') {
+      return;
     }
+
+    await sendMessage(
+      InternalExtensionActions.MountFloatingExtension, 
+      null, 
+      { context: ExtensionComponents.ContentScript, tabId: newTabId }
+    );
+  });
+}
+
+function addSuspendListener(newTabId: number) {
+  chrome.tabs.onRemoved.addListener(async (tabId, _) => {
+    if (tabId !== newTabId) {
+      return;
+    }
+
+    const state = await getStore();
+    state.resetStore();
+
+    console.log("State cleared")
   });
 }

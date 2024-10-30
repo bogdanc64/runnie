@@ -7,12 +7,12 @@ interface TestsState {
     tests: any[],
 }
 
-const DefaultState: TestsState = {
+const DefaultStore: TestsState = {
     tests: [],
 }
 
 export const useTestsStore = defineStore("tests", {
-    state: () => ({ ...DefaultState }),
+    state: () => ({ ...DefaultStore }),
 
     actions: {
         startTest() {
@@ -21,11 +21,13 @@ export const useTestsStore = defineStore("tests", {
                     id: 1,
                     URL: "https://emag.ro",
                     steps: [{
+                        id: 1,
                         action: "left-click",
                         identifier: "//*[@id=\"auxiliary\"]/div/div/ul[2]/li[3]/a"
                     },{
-                        action: "left-click",
-                        identifier: "//*[@id=\"cp_widget_63464\"]/div/div[2]/div[1]/a"
+                        id: 2,
+                        action: "left-click",//*[@id="cp_widget_44917"]/div/div/div/a[10]
+                        identifier: "//*[@id=\"cp_widget_44917\"]/div/div/div/a[10]"
                     }]
                 } as Test
             } as StartTestPayload;

@@ -1,38 +1,152 @@
 import { sendMessage } from "webext-bridge/content-script";
 import { ExtensionComponents } from "@/common/constants";
-import { StartTestPayload } from "runnie-common";
+import { StartTestPayload, TestRun, TestRunStatus } from "runnie-common";
 import { InternalExtensionActions } from "@/common/internal-actions";
-import { Step } from "runnie-common/dist/src/models/step";
 import { getElementByXPath } from "@/utils/dom.util";
+import { getStore } from "../store";
 
 export const startTest = async (testingPayload: StartTestPayload) => {
     try {
+        const store = await getStore();
+
         const result: { success: boolean; tabId: number; } = await sendMessage(
             InternalExtensionActions.PrepareTestingEnvironment,
             testingPayload as any,
             ExtensionComponents.Background
         );
 
-        for (const step of testingPayload.selectedTest.steps) {
-            await sendMessage(
-                InternalExtensionActions.RunStep,
-                step as any,
-                { context: ExtensionComponents.ContentScript, tabId: result.tabId }
-            );
+        if (!result.success) {
+            throw new Error("The testing environment couldn't be created.")
         }
+        
+        await store.extension.setCurrentTestingTabId(result.tabId);
+        await store.runner.setCurrentTest(testingPayload.selectedTest);
+        await store.runner.setCurrentStep(testingPayload.selectedTest.steps[0]);
+
+        await delay(3000); // TODO: Find a way to fix it.
+        sendMessage(
+            InternalExtensionActions.RunCurrentStep,
+            null,
+            { context: ExtensionComponents.ContentScript, tabId: result.tabId }
+        );
     } catch (error) {
         console.error(`Something happened while running the test. - ${error}`);
     }
 }
 
-export const runStep = async (step: Step) => {
+export const runCurrentStep = async () => {
     try {
-        console.log(`Running step: ${step.action} on ${step.identifier}`);
+        await delay(3000); // TODO: Find a way to fix it.
+        const store = await getStore();
+    
+        if (store.extension.currentTestingTabId === null) {
+            throw new Error("No tab is linked with the current test.");
+        }
 
-        const element = getElementByXPath(step.identifier);
+        if (!store.runner.currentTest || !store.runner.currentStep) {
+            await sendMessage(
+                InternalExtensionActions.FinishTest,
+                { status: TestRunStatus.Passed },
+                { context: ExtensionComponents.ContentScript, tabId: store.extension.currentTestingTabId }
+            );
+            return;
+        }
 
-        element?.click();
+        const currentStep = store.runner.currentStep;
+        console.log(`Running step: ${currentStep.action} on ${currentStep.identifier}`);
+
+        const element = getElementByXPath(currentStep.identifier);
+        
+        if (!element) {
+            throw new Error(`Element not found: ${currentStep.identifier}`);
+        }
+        
+        element.click();
+
+        sendMessage(
+            InternalExtensionActions.StepComplete,
+            null,
+            { context: ExtensionComponents.ContentScript, tabId: store.extension.currentTestingTabId }
+        );      
     } catch (error) {
-        console.error(`Something happened while running the test. - ${error}`);
+        console.error(`Error running step. - ${error}`);
+
+        const store = await getStore();
+        if (store.extension.currentTestingTabId === null) {
+            return;
+        }
+
+        await sendMessage(
+            InternalExtensionActions.FinishTest,
+            { status: TestRunStatus.Failed },
+            { context: ExtensionComponents.ContentScript, tabId: store.extension.currentTestingTabId }
+        );
+    }
+}
+
+export const stepComplete = async () => {
+    try {
+        const store = await getStore();
+
+        if (!store.runner.currentTest || !store.runner.currentStep) {
+            throw new Error("There isn't a test or a step set in the state.");
+        }
+
+        const currentTest = store.runner.currentTest;
+        const currentStepIndex = currentTest.steps.findIndex(step => step.id === store.runner.currentStep?.id);
+
+        if (currentStepIndex === -1) {
+            throw new Error("Current step not found in the test.");
+        }
+
+        if (store.extension.currentTestingTabId === null) {
+            throw new Error("No tab is linked with the current test.");
+        }
+
+        const nextStep = currentStepIndex + 1 < currentTest.steps.length
+            ? currentTest.steps[currentStepIndex + 1]
+            : null;
+
+        await store.runner.setCurrentStep(nextStep);
+
+        sendMessage(
+            InternalExtensionActions.RunCurrentStep,
+            null,
+            { context: ExtensionComponents.ContentScript, tabId: store.extension.currentTestingTabId }
+        );
+    } catch (error) {
+        console.error(`Error when setting the current step. - ${error}`);
+        
+        const store = await getStore();
+        if (store.extension.currentTestingTabId === null) {
+            return;
+        }
+        
+        await sendMessage(
+            InternalExtensionActions.FinishTest,
+            { status: TestRunStatus.Failed },
+            { context: ExtensionComponents.ContentScript, tabId: store.extension.currentTestingTabId }
+        );
+    }
+}
+
+export const finishTest = async (payload: { status: TestRunStatus }) => {
+    try {
+        const store = await getStore();
+        const testRun: TestRun = {
+            id: -1,
+            testId: String(store.runner.currentTest?.id ?? ""),
+            status: payload.status,
+            startTime: Date.now(),
+            endTime: Date.now(),
+        }
+
+        console.log(testRun)
+
+        await store.runner.setCurrentTest(null);
+        await store.runner.setCurrentStep(null);
+        await store.runner.setCurrentTestRun(testRun);
+    } catch (error) {
+        console.error(`Error when finishing the test. - ${error}`);
     }
 }

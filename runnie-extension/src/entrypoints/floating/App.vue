@@ -6,11 +6,53 @@
     >
       {{ config.displayedAppTitle }}
     </div>
+    <button @click="refreshState">Refresh state</button>
+    <div class="ps-3 flex flex-col mt-5">
+      <template v-if="storeLoaded">
+        <template v-if="store?.runner.currentStep">
+          <span>
+            💬 Running
+            <span class="font-semibold break-words"
+              >{{ store.runner.currentStep.identifier }}
+            </span>
+            step
+          </span>
+        </template>
+        <template
+          v-else-if="
+            store?.runner.currentTestRun?.status === TestRunStatus.Passed
+          "
+        >
+          ✅ Test run has been completed.
+        </template>
+        <template v-else> ❌ Test run has been failed. </template>
+      </template>
+      <template v-else>
+        <div>Loading...</div>
+      </template>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
 import { config } from "@/config";
+import { getStore, Store } from "@/units/store";
+import { TestRunStatus } from "runnie-common";
+
+const store = ref<Store | null>(null);
+const storeLoaded = ref(false);
+
+// TODO: Refactor this to use Suspense - async component
+onMounted(async () => {
+  await refreshState();
+});
+
+const refreshState = async () => {
+  storeLoaded.value = false;
+  store.value = await getStore();
+  storeLoaded.value = true;
+};
 </script>
 
 <style>
@@ -24,6 +66,7 @@ import { config } from "@/config";
   border-radius: 5px;
   z-index: 9999;
   min-width: 240px;
+  max-width: 240px;
   height: 300px;
   font-family: Arial, sans-serif;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);

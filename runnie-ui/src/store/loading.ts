@@ -4,12 +4,12 @@ interface LoadingState {
   states: { [key: string]: boolean }
 }
 
-const DefaultState = {
+const DefaultStore = {
     states: {}
 };
 
 export const useLoadingStore = defineStore('loading', {
-    state: (): LoadingState => DefaultState,
+    state: (): LoadingState => DefaultStore,
     getters: {
         isLoading: (state): ((key: string) => boolean) => {
             return (key: string) => state.states[key] ?? false;

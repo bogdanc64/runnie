@@ -8,13 +8,13 @@ interface AuthState {
   isAuthenticated: boolean;
 }
 
-const DefaultState: AuthState = {
+const DefaultStore: AuthState = {
   authResponse: null,
   isAuthenticated: false
 }
 
 export const useAuthStore = defineStore("auth", {
-  state: () => ({ ...DefaultState }),
+  state: () => ({ ...DefaultStore }),
 
   getters: {
     getFullName(): string {
@@ -35,7 +35,7 @@ export const useAuthStore = defineStore("auth", {
 
   actions: {
     resetState() {
-      const defaultState = { ...DefaultState};
+      const defaultState = { ...DefaultStore};
       this.authResponse = defaultState.authResponse;
       this.isAuthenticated = defaultState.isAuthenticated;
     },
