@@ -23,9 +23,9 @@
             store?.runner.currentTestRun?.status === TestRunStatus.Passed
           "
         >
-          ✅ Test run has been completed.
+          ✅ The test execution was finished successfully.
         </template>
-        <template v-else> ❌ Test run has been failed. </template>
+        <template v-else> ❌ The test execution has failed. </template>
       </template>
       <template v-else>
         <div>Loading...</div>

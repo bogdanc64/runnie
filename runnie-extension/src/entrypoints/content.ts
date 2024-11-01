@@ -7,8 +7,6 @@ import { ExtensionComponents } from '@/common/constants';
 import { config } from '@/config';
 import { BridgeMessage } from 'webext-bridge';
 import { InternalExtensionActions } from '@/common/internal-actions';
-import { finishTest, runCurrentStep, stepComplete } from '@/units/runner';
-import { getStore } from '@/units/store';
 
 export default defineContentScript({
   matches: ['<all_urls>'],
@@ -17,41 +15,12 @@ export default defineContentScript({
   async main(context) {
     defineInternalMessageHandlers(context);
     await sendMessage(InternalExtensionActions.SetupExtension, null, ExtensionComponents.Background);
-    await checkIfIsTestRunning();
   },
 });
 
-const checkIfIsTestRunning = async () => {
-  const store = await getStore();
-  // TODO: Add an util for comparing the objects
-  if (
-    store.runner.currentTest === null
-    || (
-      store.runner.currentStep?.identifier == store.runner.currentTest.steps[0]?.identifier
-      && store.runner.currentStep?.action == store.runner.currentTest.steps[0]?.action
-    )
-    || !store.extension.currentTestingTabId
-  ) {
-    console.log("returned")
-    return;
-  }
-
-  sendMessage(
-    InternalExtensionActions.RunCurrentStep,
-    null,
-    { context: ExtensionComponents.ContentScript, tabId: store.extension.currentTestingTabId }
-  );
-}
-
 const defineInternalMessageHandlers = (context: ContentScriptContext) => {
-  onMessage(InternalExtensionActions.ConnectToWebApp, async (message: BridgeMessage<any>) => await connectToWebApp(message.data));  
-  
-  // Handlers for testing browser instance
-  onMessage(InternalExtensionActions.MountFloatingExtension, async () => await mountFloatingExtension(context));
-  onMessage(InternalExtensionActions.RunCurrentStep, async () => await runCurrentStep());
-  onMessage(InternalExtensionActions.StepComplete, async () => await stepComplete());
-  onMessage(InternalExtensionActions.ClearState, async () => (await getStore()).resetStore());
-  onMessage(InternalExtensionActions.FinishTest, async (message: BridgeMessage<any>) => await finishTest(message.data));
+  onMessage(InternalExtensionActions.ConnectToWebApp, async (message: BridgeMessage<any>) => await connectToWebApp(message.data));    
+  onMessage(InternalExtensionActions.MountFloatingExtension, async () => await mountFloatingExtension(context));  
 }
 
 const connectToWebApp = async (settings: ExtensionSettings | null) => {

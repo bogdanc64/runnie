@@ -1,37 +1,24 @@
-import { sendMessage } from "webext-bridge/content-script";
-import { ExtensionComponents } from "@/common/constants";
 import { StartTestPayload, TestRun, TestRunStatus } from "runnie-common";
-import { InternalExtensionActions } from "@/common/internal-actions";
 import { getElementByXPath } from "@/utils/dom.util";
 import { getStore } from "../store";
 
-export const startTest = async (testingPayload: StartTestPayload) => {
+export const startTest = async (testingPayload: StartTestPayload & { tabId: number}) => {
     try {
         const store = await getStore();
 
-        const result: { success: boolean; tabId: number; } = await sendMessage(
-            InternalExtensionActions.PrepareTestingEnvironment,
-            testingPayload as any,
-            ExtensionComponents.Background
-        );
-
-        if (!result.success) {
-            throw new Error("The testing environment couldn't be created.")
-        }
-        
-        await store.extension.setCurrentTestingTabId(result.tabId);
         await store.runner.setCurrentTest(testingPayload.selectedTest);
         await store.runner.setCurrentStep(testingPayload.selectedTest.steps[0]);
-
-        await delay(3000); // TODO: Find a way to fix it.
-        sendMessage(
-            InternalExtensionActions.RunCurrentStep,
-            null,
-            { context: ExtensionComponents.ContentScript, tabId: result.tabId }
-        );
+        await store.extension.setCurrentTestingTabId(testingPayload.tabId);
     } catch (error) {
         console.error(`Something happened while running the test. - ${error}`);
     }
+}
+
+export const injectRunnerScript = async(tabId: number, origin: boolean = false) => {
+    await browser.scripting.executeScript({
+        target: { tabId: tabId },
+        files: ['runner.js'],
+    });
 }
 
 export const runCurrentStep = async () => {
@@ -44,11 +31,7 @@ export const runCurrentStep = async () => {
         }
 
         if (!store.runner.currentTest || !store.runner.currentStep) {
-            await sendMessage(
-                InternalExtensionActions.FinishTest,
-                { status: TestRunStatus.Passed },
-                { context: ExtensionComponents.ContentScript, tabId: store.extension.currentTestingTabId }
-            );
+            await finishTest({ status: TestRunStatus.Passed });
             return;
         }
 
@@ -63,11 +46,7 @@ export const runCurrentStep = async () => {
         
         element.click();
 
-        sendMessage(
-            InternalExtensionActions.StepComplete,
-            null,
-            { context: ExtensionComponents.ContentScript, tabId: store.extension.currentTestingTabId }
-        );      
+        await stepComplete();    
     } catch (error) {
         console.error(`Error running step. - ${error}`);
 
@@ -76,11 +55,7 @@ export const runCurrentStep = async () => {
             return;
         }
 
-        await sendMessage(
-            InternalExtensionActions.FinishTest,
-            { status: TestRunStatus.Failed },
-            { context: ExtensionComponents.ContentScript, tabId: store.extension.currentTestingTabId }
-        );
+        await finishTest({ status: TestRunStatus.Failed });
     }
 }
 
@@ -108,12 +83,7 @@ export const stepComplete = async () => {
             : null;
 
         await store.runner.setCurrentStep(nextStep);
-
-        sendMessage(
-            InternalExtensionActions.RunCurrentStep,
-            null,
-            { context: ExtensionComponents.ContentScript, tabId: store.extension.currentTestingTabId }
-        );
+        await runCurrentStep();
     } catch (error) {
         console.error(`Error when setting the current step. - ${error}`);
         
@@ -122,11 +92,7 @@ export const stepComplete = async () => {
             return;
         }
         
-        await sendMessage(
-            InternalExtensionActions.FinishTest,
-            { status: TestRunStatus.Failed },
-            { context: ExtensionComponents.ContentScript, tabId: store.extension.currentTestingTabId }
-        );
+        await finishTest({ status: TestRunStatus.Failed });
     }
 }
 
@@ -140,8 +106,6 @@ export const finishTest = async (payload: { status: TestRunStatus }) => {
             startTime: Date.now(),
             endTime: Date.now(),
         }
-
-        console.log(testRun)
 
         await store.runner.setCurrentTest(null);
         await store.runner.setCurrentStep(null);
