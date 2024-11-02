@@ -8,13 +8,13 @@ interface ExtensionState {
     settings: ExtensionSettings | null
 }
 
-const DefaultState: ExtensionState = {
+const DefaultStore: ExtensionState = {
     isConnected: false,
     settings: null,
 }
 
 export const useExtensionStore = defineStore("extension", {
-    state: () => ({ ...DefaultState }),
+    state: () => ({ ...DefaultStore }),
 
     getters: {
         isPreparedForTesting: (state) => state.isConnected && state.settings?.isAllowedInIncognito,

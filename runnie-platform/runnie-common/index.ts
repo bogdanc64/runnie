@@ -6,7 +6,9 @@ import { Role, UserRoles } from "./src/models/role";
 import { Permission, PermissionAction, PermissionResource } from "./src/models/permission";
 import { ExtensionExternalMessageType, ExtensionMessage, ExtensionSettings } from "./src/models/extension";
 import { StartTestPayload, Test } from "./src/models/tests";
+import { TestRun, TestRunStatus } from "./src/models/test-run";
 
+// TODO: Cleanup this
 export {
     ApiClient,
     AuthResponse,
@@ -24,5 +26,7 @@ export {
     Test,
     StartTestPayload,
     ExtensionExternalMessageType,
-    ExtensionSettings
+    ExtensionSettings,
+    TestRun,
+    TestRunStatus
 };

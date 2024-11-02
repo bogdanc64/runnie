@@ -6,11 +6,15 @@
     >
       {{ config.displayedAppTitle }}
     </div>
+    <div class="ps-3 flex flex-col mt-5">
+      <test-run-details></test-run-details>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { config } from "@/config";
+import TestRunDetails from "./components/TestRunDetails.vue";
 </script>
 
 <style>
@@ -24,6 +28,7 @@ import { config } from "@/config";
   border-radius: 5px;
   z-index: 9999;
   min-width: 240px;
+  max-width: 240px;
   height: 300px;
   font-family: Arial, sans-serif;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
