@@ -27,7 +27,7 @@ export const useTestsStore = defineStore("tests", {
                     },{
                         id: 2,
                         action: "left-click",//*[@id="cp_widget_44917"]/div/div/div/a[10]
-                        identifier: "//*[@id=\"cp_widget_44917\"]/div/div/div/a[10]"
+                        identifier: "//*[@id=\"cp_widget_63451\"]/div/div/div/a[1]"
                     }]
                 } as Test
             } as StartTestPayload;

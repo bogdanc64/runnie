@@ -1,3 +1,4 @@
+import { StoreIdentifier } from "@/common/constants";
 import { defineExtensionStore, ExtensionStore } from "./extension/store";
 import { defineRunnerStore, RunnerStore } from "./runner/store"
 
@@ -15,16 +16,12 @@ export const getStore = async (): Promise<Store> => {
     }
     return storeInstance;
 };
-export const persistState = () => {
+
+export const persistState = async () => {
     if (!storeInstance) return;
-    
+
     try {
-        chrome.storage.session.set({
-            backgroundState: {
-                runner: storeInstance.runner,
-                extension: storeInstance.extension
-            }
-        });
+        await storage.setItem(StoreIdentifier, storeInstance);
     } catch (error) {
         console.error('Failed to persist state:', error);
     }
@@ -38,23 +35,23 @@ export const withPersistence = <T>(action: () => T): T => {
 
 export const withPersistenceAsync = async <T>(action: () => Promise<T> | T): Promise<T> => {
     const result = action();
-    persistState();
+    await persistState();
     return result;
 };
 
 const retrieveStateFromStorage = async (): Promise<Store | null> => {
     try {
-        const savedState = await chrome.storage.session.get('backgroundState');
+        const savedStore = await storage.getItem(StoreIdentifier) as Store;
 
-        if (!savedState.backgroundState) {
+        if (!savedStore) {
             return null;
         }
         
         const runner = defineRunnerStore();
         const extension = defineExtensionStore();
         
-        Object.assign(runner, savedState.backgroundState.runner);
-        Object.assign(extension, savedState.backgroundState.extension);
+        Object.assign(runner, savedStore.runner);
+        Object.assign(extension, savedStore.extension);
         
         const store = {
             runner,

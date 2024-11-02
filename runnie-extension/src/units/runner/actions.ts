@@ -82,8 +82,12 @@ export const stepComplete = async () => {
             ? currentTest.steps[currentStepIndex + 1]
             : null;
 
-        await store.runner.setCurrentStep(nextStep);
-        await runCurrentStep();
+        if (nextStep !== null) {
+            await store.runner.setCurrentStep(nextStep);
+            await runCurrentStep();
+        } else {
+            await finishTest({ status: TestRunStatus.Passed });
+        }
     } catch (error) {
         console.error(`Error when setting the current step. - ${error}`);
         

@@ -11,18 +11,18 @@ export interface ExtensionStoreSetters {
 
 export type ExtensionStore = ExtensionStoreFields & ExtensionStoreSetters;
 
-const DefaultState: ExtensionStoreFields = {
+const DefaultStore: ExtensionStoreFields = {
     currentTestingTabId: null,
 };
 
 export const defineExtensionStore = (): ExtensionStore => {
-    const storeFields: ExtensionStoreFields = { ...DefaultState };
+    const storeFields: ExtensionStoreFields = { ...DefaultStore };
 
     const store: ExtensionStore = {
         ...storeFields,
         resetState() {
             return withPersistenceAsync(() => {
-                Object.assign(this, DefaultState);
+                Object.assign(this, DefaultStore);
             })
         },
         setCurrentTestingTabId(tabId: number | null) {

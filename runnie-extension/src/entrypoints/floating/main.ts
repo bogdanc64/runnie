@@ -3,6 +3,7 @@ import App from './App.vue';
 import { ContentScriptContext } from 'wxt/client';
 import { createApp } from 'vue';
 import { config } from "@/config";
+import { createPinia } from "pinia";
 
 export const mountFloatingExtension = async (context: ContentScriptContext) => {
   try {
@@ -16,7 +17,10 @@ export const mountFloatingExtension = async (context: ContentScriptContext) => {
       position: 'overlay',
       onMount(container) {
         try {
+          const pinia = createPinia();
           const app = createApp(App);
+
+          app.use(pinia)
           app.mount(container);
 
           addDragFunctionality({ 

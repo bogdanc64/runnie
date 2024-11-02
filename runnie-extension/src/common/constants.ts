@@ -1,3 +1,5 @@
+export const StoreIdentifier = "session:runnie-store"
+
 export enum ExtensionComponents {
     Background = "background",
     ContentScript = "content-script",

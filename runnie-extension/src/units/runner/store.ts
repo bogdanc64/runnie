@@ -17,20 +17,20 @@ export interface RunnerStoreSetters {
 
 export type RunnerStore = RunnerStoreFields & RunnerStoreSetters;
 
-const DefaultState: RunnerStoreFields = {
+export const DefaultStore: RunnerStoreFields = {
     currentTest: null,
     currentStep: null,
     currentTestRun: null
 };
 
 export const defineRunnerStore = (): RunnerStore => {
-    const storeFields: RunnerStoreFields = { ...DefaultState };
+    const storeFields: RunnerStoreFields = { ...DefaultStore };
 
     const store: RunnerStore = {
         ...storeFields,
         resetState() {
             return withPersistenceAsync(() => {
-                Object.assign(this, DefaultState);
+                Object.assign(this, DefaultStore);
             })
         },
         setCurrentTestRun(testRun: TestRun | null) {

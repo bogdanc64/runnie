@@ -6,53 +6,15 @@
     >
       {{ config.displayedAppTitle }}
     </div>
-    <button @click="refreshState">Refresh state</button>
     <div class="ps-3 flex flex-col mt-5">
-      <template v-if="storeLoaded">
-        <template v-if="store?.runner.currentStep">
-          <span>
-            💬 Running
-            <span class="font-semibold break-words"
-              >{{ store.runner.currentStep.identifier }}
-            </span>
-            step
-          </span>
-        </template>
-        <template
-          v-else-if="
-            store?.runner.currentTestRun?.status === TestRunStatus.Passed
-          "
-        >
-          ✅ The test execution was finished successfully.
-        </template>
-        <template v-else> ❌ The test execution has failed. </template>
-      </template>
-      <template v-else>
-        <div>Loading...</div>
-      </template>
+      <test-run-details></test-run-details>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
 import { config } from "@/config";
-import { getStore, Store } from "@/units/store";
-import { TestRunStatus } from "runnie-common";
-
-const store = ref<Store | null>(null);
-const storeLoaded = ref(false);
-
-// TODO: Refactor this to use Suspense - async component
-onMounted(async () => {
-  await refreshState();
-});
-
-const refreshState = async () => {
-  storeLoaded.value = false;
-  store.value = await getStore();
-  storeLoaded.value = true;
-};
+import TestRunDetails from "./components/TestRunDetails.vue";
 </script>
 
 <style>
