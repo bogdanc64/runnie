@@ -1,5 +1,5 @@
 import { onMessage } from 'webext-bridge/background'
-import { prepareTestingEnvironment, setupExtension } from '@/units/extension';
+import { prepareTestingEnvironment, setupExtension } from '@/units/extension/actions';
 import { InternalExtensionActions } from '@/common/internal-actions';
 import { defineBackground } from 'wxt/sandbox'
 

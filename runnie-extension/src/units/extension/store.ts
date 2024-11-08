@@ -2,17 +2,20 @@ import { withPersistenceAsync } from "../store";
 
 export interface ExtensionStoreFields {
     currentTestingTabId: number | null;
+    isWaitingForNetworkRequests: boolean;
 }
 
 export interface ExtensionStoreSetters {
     resetState(): Promise<void>;
     setCurrentTestingTabId(tabId: number | null): Promise<void>;
+    setIsWaitingForNetworkRequests(value: boolean): Promise<void>;
 }
 
 export type ExtensionStore = ExtensionStoreFields & ExtensionStoreSetters;
 
-const DefaultStore: ExtensionStoreFields = {
+export const DefaultStore: ExtensionStoreFields = {
     currentTestingTabId: null,
+    isWaitingForNetworkRequests: false,
 };
 
 export const defineExtensionStore = (): ExtensionStore => {
@@ -23,6 +26,11 @@ export const defineExtensionStore = (): ExtensionStore => {
         resetState() {
             return withPersistenceAsync(() => {
                 Object.assign(this, DefaultStore);
+            })
+        },
+        setIsWaitingForNetworkRequests(value: boolean) {
+            return withPersistenceAsync(() => {
+                this.isWaitingForNetworkRequests = value;
             })
         },
         setCurrentTestingTabId(tabId: number | null) {

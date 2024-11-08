@@ -56,10 +56,7 @@ const retrieveStateFromStorage = async (): Promise<Store | null> => {
         const store = {
             runner,
             extension,
-            resetStore: () => {
-                runner.resetState();
-                extension.resetState();
-            }
+            resetStore: () => storage.removeItem(StoreIdentifier) // TODO: Take into consideration partial store deleting
         };
         
         return store;
@@ -84,10 +81,7 @@ const defineStore = async (): Promise<Store> => {
     storeInstance = {
         runner: defineRunnerStore(),
         extension: defineExtensionStore(),
-        resetStore: () => {
-            storeInstance?.runner.resetState();
-            storeInstance?.extension.resetState();
-        }
+        resetStore: () => storage.removeItem(StoreIdentifier)
     };
 
     return storeInstance;
