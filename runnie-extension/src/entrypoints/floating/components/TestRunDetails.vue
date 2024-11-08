@@ -1,5 +1,8 @@
 <template>
-  <template v-if="runnerStore.currentStep">
+  <template v-if="extensionStore.isWaitingForNetworkRequests">
+    🛜 Waiting the network requests to finish.
+  </template>
+  <template v-else-if="runnerStore.currentStep">
     <span>
       💬 Running
       <span class="font-semibold break-words"
@@ -19,10 +22,13 @@
 <script setup lang="ts">
 import { TestRunStatus } from "runnie-common";
 import { useRunnerStore } from "../store/runner";
+import { useExtensionStore } from "../store/extension";
 
+const extensionStore = useExtensionStore();
 const runnerStore = useRunnerStore();
 
 onMounted(() => {
+  extensionStore.initialize();
   runnerStore.initialize();
 });
 </script>

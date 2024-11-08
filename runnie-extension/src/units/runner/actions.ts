@@ -14,7 +14,7 @@ export const startTest = async (testingPayload: StartTestPayload & { tabId: numb
     }
 }
 
-export const injectRunnerScript = async(tabId: number, origin: boolean = false) => {
+export const injectRunnerScript = async(tabId: number) => {
     await browser.scripting.executeScript({
         target: { tabId: tabId },
         files: ['runner.js'],
@@ -23,7 +23,7 @@ export const injectRunnerScript = async(tabId: number, origin: boolean = false) 
 
 export const runCurrentStep = async () => {
     try {
-        await delay(3000); // TODO: Find a way to fix it.
+        await delay(1000); // TODO: Find a way to fix it. - run the step only after the page is loaded & network calls are done
         const store = await getStore();
     
         if (store.extension.currentTestingTabId === null) {

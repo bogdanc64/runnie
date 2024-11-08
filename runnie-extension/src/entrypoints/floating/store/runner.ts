@@ -1,16 +1,11 @@
 import { StoreIdentifier } from "@/common/constants";
-import { useInitializeStore } from "@/composables/useInitializeStore";
 import { RunnerStoreFields, DefaultStore } from "@/units/runner/store";
-import { Store, withPersistenceAsync } from "@/units/store";
+import { Store } from "@/units/store";
 import { defineStore } from "pinia";
 import { storage } from "wxt/storage"
 
 export const useRunnerStore = defineStore("runner", {
     state: () => ({ ...DefaultStore }),
-
-    getters: {
-
-    },
 
     actions: {
         async initialize() {
@@ -25,10 +20,3 @@ export const useRunnerStore = defineStore("runner", {
         }
     }
 });
-
-storage.watch(StoreIdentifier, (changes: Store | null) => {
-    if (changes?.runner) {
-        const store = useRunnerStore();
-        store.updateStoreFromStorage(changes.runner as RunnerStoreFields);
-    }
-})

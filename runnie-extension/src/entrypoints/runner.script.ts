@@ -1,4 +1,4 @@
-import { runCurrentStep } from '@/units/runner';
+import { runCurrentStep } from '@/units/runner/actions';
 import { getStore } from '@/units/store';
 
 export default defineUnlistedScript(async () => {
