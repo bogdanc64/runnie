@@ -1,6 +1,6 @@
 export interface Model {
     id: number;   
-    created?: Date;
+    created: Date;
     modified?: Date; 
-    deleted?: boolean;
+    deleted: boolean;
 }

@@ -14,8 +14,11 @@
   import DarkModeToggle from "@/components/ui/darkmode-toggle/DarkModeToggle.vue";
   import { useAuthStore } from "@/store/auth";
   import { useRouter } from "vue-router";
+  import AssetSelector from "../assets/AssetSelector.vue";
+  import { useAssetStore } from "@/store/asset";
 
   const authStore = useAuthStore();
+  const assetStore = useAssetStore();
   const router = useRouter();
 
   async function logout() {
@@ -57,13 +60,14 @@
         </nav>
       </SheetContent>
     </Sheet>
-    <DarkModeToggle />
+    <AssetSelector :assets="assetStore.assets" />
     <div class="w-full flex-1"></div>
+    <DarkModeToggle />
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
         <Button variant="secondary" size="icon-sm" class="rounded-full">
           <template v-if="authStore.getUserAvatar">
-            <img class="rounded-full" :src="authStore.getUserAvatar" />
+            <img class="rounded-full" alt="Avatar" :src="authStore.getUserAvatar" />
           </template>
           <template v-else>
             <CircleUser class="h-5 w-5" />
@@ -72,7 +76,7 @@
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>{{ authStore.getFullName }}</DropdownMenuLabel>
+        <DropdownMenuLabel>{{ authStore.getFullName }} ({{ authStore.getOrganizationName }})</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem class="cursor-pointer">Settings</DropdownMenuItem>
         <DropdownMenuItem class="cursor-pointer">Support</DropdownMenuItem>

@@ -1,9 +1,11 @@
 <script setup lang="ts">
   import { RouterView } from "vue-router";
-  import { setupExtensionConnection } from "@/composables/setupExtensionConnection";
+  import { useSetupExtensionConnection } from "@/composables/useSetupExtensionConnection";
+  import { useHydrateState } from "@/composables/useHydrateState";
   import Toaster from "@/components/ui/toast/Toaster.vue";
 
-  setupExtensionConnection();
+  useSetupExtensionConnection();
+  useHydrateState();
 </script>
 
 <template>

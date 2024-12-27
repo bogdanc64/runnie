@@ -1,22 +1,23 @@
-import { User as IUser } from "runnie-common"
-import { Entity, Property, Unique } from '@mikro-orm/core';
+import { User } from "runnie-common"
+import { Entity, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import { BaseEntity } from "./base.entity";
 import { UserStatus } from "runnie-common/dist/src/models/user";
+import { OrganizationEntity } from "./organization.entity";
 
 @Entity({ tableName: "users" })
-export class User extends BaseEntity implements IUser {
+export class UserEntity extends BaseEntity implements User {
     @Property()
     @Unique()
-    email!: string;
+    email: string;
 
     @Property()
-    name!: string;
+    name: string;
 
     @Property({ nullable: true })
     photo?: string;
 
     @Property({ default: "user" })
-    role!: string;
+    role: string;
 
     @Property({ nullable: true })
     passwordHash?: string;
@@ -37,8 +38,11 @@ export class User extends BaseEntity implements IUser {
     resetPasswordTokenDate?: Date;
 
     @Property({ default: UserStatus.Pending })
-    status!: UserStatus;
+    status: UserStatus;
 
     @Property({ default: false })
-    isOAuthUser!: boolean;
+    isOAuthUser: boolean;
+
+    @ManyToOne(() => OrganizationEntity)
+    organization: OrganizationEntity;
 }

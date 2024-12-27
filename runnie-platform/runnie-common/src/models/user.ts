@@ -1,4 +1,5 @@
 import { Model } from "./model";
+import { Organization } from "./organization";
 
 export enum UserStatus {
     Active,
@@ -10,5 +11,6 @@ export interface User extends Model {
     name: string;
     photo?: string;
     role: string;
-    status: UserStatus
+    status: UserStatus;
+    organization: Organization;
 }

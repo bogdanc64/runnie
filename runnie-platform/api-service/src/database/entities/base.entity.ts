@@ -4,7 +4,7 @@ import { Model } from "runnie-common";
 export abstract class BaseEntity implements Model {
     @PrimaryKey()
     @Unique()
-    id!: number;
+    id: number;
 
     @Property({ defaultRaw: 'CURRENT_TIMESTAMP' })
     created: Date = new Date();

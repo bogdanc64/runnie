@@ -14,6 +14,7 @@ import { v4 as uuid } from 'uuid';
 import { ResetPasswordDTO } from 'runnie-common/dist/src/models/auth';
 import { PermissionService } from '../permission/permission.service';
 import { PermissionUtil } from 'src/common/utils/permission.util';
+import { UserEntity } from 'src/database/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -31,11 +32,11 @@ export class AuthService {
     const authConfig = this.getAuthConfig();
     const tokenData = this.getTokenData(user.id);    
 
-    const updatedUser = { 
+    const updateUserPayload = { 
       ...user,
       refreshToken: await argon.hash(tokenData.refreshToken) 
-    };
-    await this.userService.upsertUser(updatedUser);
+    } as Partial<UserEntity>;
+    const updatedUser = await this.userService.upsert(updateUserPayload);
 
     response.cookie('Authentication', tokenData.accessToken, {
       httpOnly: true,
@@ -52,11 +53,11 @@ export class AuthService {
       response.redirect(authConfig.frontendOrigin);
     }
 
-    const authResponse = await this.createAuthResponse(user);
+    const authResponse = await this.createAuthResponse(updatedUser);
     return authResponse;
   }
 
-  async signUp(body: SignUpDTO): Promise<User> {
+  async signUp(body: SignUpDTO): Promise<UserEntity> {
     try {
       const existingUser = await this.userService.getByEmail(body.email);
       if (existingUser) throw new BadRequestException('User already exists');
@@ -69,9 +70,9 @@ export class AuthService {
         status: UserStatus.Pending,
         confirmEmailToken: uuid(),
         confirmEmailTokenDate: DateUtil.addDays(new Date(), 1)
-      } as Partial<User>;
+      } as Partial<UserEntity>;
 
-      const addedUser = await this.userService.upsertUser(user); 
+      const addedUser = await this.userService.upsert(user); 
       await this.emailService.sendVerificationEmail(addedUser, addedUser.confirmEmailToken);
 
       return addedUser;
@@ -81,7 +82,7 @@ export class AuthService {
     }
   }
 
-  async signOut(user: User, response: Response) {
+  async signOut(user: User, response: Response): Promise<UserEntity> {
     try {
       response.clearCookie('Authentication');
       response.clearCookie('Refresh');
@@ -89,8 +90,9 @@ export class AuthService {
       const updatedUser = {
         ...user, 
         refreshToken: ""
-      }
-      return this.userService.upsertUser(updatedUser);
+      } as Partial<UserEntity>;
+
+      return this.userService.upsert(updatedUser);
     } catch (err) {
       console.error(`Failed to sign-out user - ${err}`)
       throw err;
@@ -109,9 +111,9 @@ export class AuthService {
         confirmEmailToken: null,
         confirmEmailTokenDate: null,
         status: UserStatus.Active
-      } as Partial<User>;
+      } as Partial<UserEntity>;
       
-      await this.userService.upsertUser(user);
+      await this.userService.upsert(user);
       
       return true;
     } catch (err) {
@@ -132,9 +134,9 @@ export class AuthService {
         ...existingUser,
         resetPasswordToken: uuid(),
         resetPasswordTokenDate: DateUtil.addDays(new Date(), 1)
-      } as Partial<User>;
+      } as Partial<UserEntity>;
 
-      const updatedUser = await this.userService.upsertUser(user); 
+      const updatedUser = await this.userService.upsert(user); 
       await this.emailService.sendResetPasswordEmail(updatedUser, updatedUser.resetPasswordToken);
 
       return true;
@@ -157,9 +159,9 @@ export class AuthService {
         passwordHash: hashedPassword,
         resetPasswordToken: null,
         resetPasswordTokenDate: null
-      } as Partial<User>;
+      } as Partial<UserEntity>;
 
-      const updatedUser = await this.userService.upsertUser(user);
+      const updatedUser = await this.userService.upsert(user);
       await this.emailService.sendResetPasswordConfirmationEmail(updatedUser);
 
       return true;
@@ -169,7 +171,7 @@ export class AuthService {
     }
   }
 
-  async verifyUserCredentials(body: SignInDTO): Promise<User> {
+  async verifyUserCredentials(body: SignInDTO): Promise<UserEntity> {
     try {
       const existingUser = await this.userService.getByEmail(body.email);
       if (!existingUser) throw new UnauthorizedException('Invalid credentials');
@@ -188,7 +190,7 @@ export class AuthService {
 
   async verifyUserRefreshToken(refreshToken: string, userId: number) {
     try {
-      const user = await this.userService.getById(userId);
+      const user = await this.userService.findOne(userId);
       if (!user || user.refreshToken === "") throw new UnauthorizedException();
 
       const authenticated = await argon.verify(user.refreshToken, refreshToken);
@@ -244,11 +246,12 @@ export class AuthService {
     const permissions = await this.permissionService.getPermissionsByRoleName(user.role);
 
     return {
-      user_id: user.id,
+      userId: user.id,
       fullName: user.name,
       email: user.email,
       role: user.role,
       avatar: user.photo,
+      organization: user.organization,
       permissions: PermissionUtil.reducePermissionsByResource(permissions)
     }
   }
