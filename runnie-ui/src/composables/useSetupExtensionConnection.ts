@@ -7,7 +7,7 @@ import { isDeviceSupported } from "@/lib/utils/browser.util";
 const MAX_RETRIES = 5;
 const TIME_BETWEEN_RETRIES = 2 * 1000;
 
-export function setupExtensionConnection() {
+export function useSetupExtensionConnection() {
     const store = useExtensionStore();
     let pingInterval: NodeJS.Timeout | undefined;
     let pingRetries: number = 0;

@@ -19,7 +19,7 @@
     "@vueuse/core": "^11.1.0",
     "lodash": "^4.17.21",
     "pinia": "^2.2.5",
-    "runnie-common": "file:dependencies/runnie-common-1.0.0.tgz",
+    "runnie-common": "file:dependencies/runnie-common-1.0.1.tgz",
     "vue": "^3.5.11",
     "webext-bridge": "^6.0.1"
   },

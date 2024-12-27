@@ -1,4 +1,5 @@
 import { Model } from "./model";
+import { Test } from "./test";
 
 export enum TestRunStatus {
     Running = "running",
@@ -9,8 +10,8 @@ export enum TestRunStatus {
 }
 
 export interface TestRun extends Model {
-    testId: string;
-    startTime: number;
-    endTime: number;
+    test: Test;
+    startTime: Date;
+    endTime: Date;
     status: TestRunStatus;
 }

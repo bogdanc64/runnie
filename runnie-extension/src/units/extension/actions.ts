@@ -4,7 +4,7 @@ import { config } from "@/config";
 import { ExtensionSettings, StartTestPayload } from "runnie-common";
 import { sendMessage } from "webext-bridge/background";
 import { getStore } from "../store";
-import { injectRunnerScript } from "../runner";
+import { injectRunnerScript } from "../runner/actions";
 
 export const setupExtension = async () => {
   const extensionSettings = {} as ExtensionSettings;
@@ -25,7 +25,7 @@ export const setupExtension = async () => {
 }
 
 export const prepareTestingEnvironment = async (message: StartTestPayload) => {
-  const url = message.selectedTest.URL;
+  const url = message.selectedTest.url;
 
   if (!url) {
     return { success: false, error: 'No URL provided' };

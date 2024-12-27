@@ -19,7 +19,7 @@ export const useTestsStore = defineStore("tests", {
             const payload = {
                 selectedTest: {
                     id: 1,
-                    URL: "https://emag.ro",
+                    url: "https://emag.ro",
                     steps: [{
                         id: 1,
                         action: "left-click",

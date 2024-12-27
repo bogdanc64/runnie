@@ -1,30 +1,24 @@
-import { EntityRepository } from '@mikro-orm/core';
+import { EntityManager, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
-import { Permission } from 'src/database/entities/permission.entity';
+import { PermissionEntity} from 'src/database/entities/permission.entity';
+import { BaseService } from '../base/base.service';
 
 @Injectable()
-export class PermissionService {
+export class PermissionService extends BaseService<PermissionEntity> {
     constructor(
-        @InjectRepository(Permission)
-        private readonly permissionRepository: EntityRepository<Permission>
-    ) {}
-
-    async getPermissions(): Promise<Permission[]> {
-        return this.permissionRepository.findAll({
-            where: { deleted: { $eq: false } }
-        });
+        @InjectRepository(PermissionEntity)
+        private readonly permissionRepository: EntityRepository<PermissionEntity>,
+        public em: EntityManager
+    ) {
+        super(permissionRepository, em);
     }
 
-    async getPermissionById(id: number): Promise<Permission> {
-        return this.permissionRepository.findOne({ id });
-    }
-
-    async getPermissionsByRoleName(roleName: string): Promise<Permission[]> {
+    async getPermissionsByRoleName(roleName: string): Promise<PermissionEntity[]> {
         return this.permissionRepository.find({
             roles: { name: roleName }
         }, {
-            populate: ['roles']
+            populate: ["roles"]
         });
     }
 }

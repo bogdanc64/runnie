@@ -4,7 +4,7 @@ import { Strategy } from 'passport-google-oauth20';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/modules/user/user.service';
-import { User } from 'runnie-common';
+import { UserEntity } from 'src/database/entities/user.entity';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -26,11 +26,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   async validate(_accessToken: string, _refreshToken: string, profile: any): Promise<any> {
-    return this.userService.upsertUser({
+    return this.userService.upsert({
         email: profile.emails[0]?.value,
         name: `${profile.name.givenName} ${profile.name.familyName}`,
         photo: profile.photos[0]?.value,
         isOAuthUser: true,
-    } as Partial<User>)
+    } as Partial<UserEntity>)
   }
 }

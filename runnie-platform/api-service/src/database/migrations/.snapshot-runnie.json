@@ -45,6 +45,203 @@
           "default": "false",
           "mappedType": "boolean"
         },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "organizations",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "created": {
+          "name": "created",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "CURRENT_TIMESTAMP",
+          "mappedType": "datetime"
+        },
+        "modified": {
+          "name": "modified",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1,
+          "default": "false",
+          "mappedType": "boolean"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "website": {
+          "name": "website",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "assets",
+      "indexes": [
+        {
+          "columnNames": [
+            "organization_id"
+          ],
+          "composite": false,
+          "keyName": "assets_organization_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "assets_organization_id_foreign": {
+          "constraintName": "assets_organization_id_foreign",
+          "columnNames": [
+            "organization_id"
+          ],
+          "localTableName": "assets",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "organizations",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "created": {
+          "name": "created",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "CURRENT_TIMESTAMP",
+          "mappedType": "datetime"
+        },
+        "modified": {
+          "name": "modified",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1,
+          "default": "false",
+          "mappedType": "boolean"
+        },
         "resource": {
           "name": "resource",
           "type": "varchar(255)",
@@ -177,8 +374,8 @@
     },
     {
       "columns": {
-        "role_id": {
-          "name": "role_id",
+        "role_entity_id": {
+          "name": "role_entity_id",
           "type": "int",
           "unsigned": true,
           "autoincrement": false,
@@ -187,8 +384,8 @@
           "length": null,
           "mappedType": "integer"
         },
-        "permission_id": {
-          "name": "permission_id",
+        "permission_entity_id": {
+          "name": "permission_entity_id",
           "type": "int",
           "unsigned": true,
           "autoincrement": false,
@@ -202,20 +399,20 @@
       "indexes": [
         {
           "columnNames": [
-            "role_id"
+            "role_entity_id"
           ],
           "composite": false,
-          "keyName": "roles_permissions_role_id_index",
+          "keyName": "roles_permissions_role_entity_id_index",
           "constraint": false,
           "primary": false,
           "unique": false
         },
         {
           "columnNames": [
-            "permission_id"
+            "permission_entity_id"
           ],
           "composite": false,
-          "keyName": "roles_permissions_permission_id_index",
+          "keyName": "roles_permissions_permission_entity_id_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -223,8 +420,8 @@
         {
           "keyName": "PRIMARY",
           "columnNames": [
-            "role_id",
-            "permission_id"
+            "role_entity_id",
+            "permission_entity_id"
           ],
           "composite": true,
           "constraint": true,
@@ -234,10 +431,10 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "roles_permissions_role_id_foreign": {
-          "constraintName": "roles_permissions_role_id_foreign",
+        "roles_permissions_role_entity_id_foreign": {
+          "constraintName": "roles_permissions_role_entity_id_foreign",
           "columnNames": [
-            "role_id"
+            "role_entity_id"
           ],
           "localTableName": "roles_permissions",
           "referencedColumnNames": [
@@ -247,10 +444,10 @@
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
-        "roles_permissions_permission_id_foreign": {
-          "constraintName": "roles_permissions_permission_id_foreign",
+        "roles_permissions_permission_entity_id_foreign": {
+          "constraintName": "roles_permissions_permission_entity_id_foreign",
           "columnNames": [
-            "permission_id"
+            "permission_entity_id"
           ],
           "localTableName": "roles_permissions",
           "referencedColumnNames": [
@@ -258,6 +455,371 @@
           ],
           "referencedTableName": "permissions",
           "deleteRule": "cascade",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "created": {
+          "name": "created",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "CURRENT_TIMESTAMP",
+          "mappedType": "datetime"
+        },
+        "modified": {
+          "name": "modified",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1,
+          "default": "false",
+          "mappedType": "boolean"
+        },
+        "url": {
+          "name": "url",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "asset_id": {
+          "name": "asset_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "tests",
+      "indexes": [
+        {
+          "columnNames": [
+            "asset_id"
+          ],
+          "composite": false,
+          "keyName": "tests_asset_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "tests_asset_id_foreign": {
+          "constraintName": "tests_asset_id_foreign",
+          "columnNames": [
+            "asset_id"
+          ],
+          "localTableName": "tests",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "assets",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "created": {
+          "name": "created",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "CURRENT_TIMESTAMP",
+          "mappedType": "datetime"
+        },
+        "modified": {
+          "name": "modified",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1,
+          "default": "false",
+          "mappedType": "boolean"
+        },
+        "action": {
+          "name": "action",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "photo": {
+          "name": "photo",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "test_id": {
+          "name": "test_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "steps",
+      "indexes": [
+        {
+          "columnNames": [
+            "test_id"
+          ],
+          "composite": false,
+          "keyName": "steps_test_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "steps_test_id_foreign": {
+          "constraintName": "steps_test_id_foreign",
+          "columnNames": [
+            "test_id"
+          ],
+          "localTableName": "steps",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "tests",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "created": {
+          "name": "created",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "CURRENT_TIMESTAMP",
+          "mappedType": "datetime"
+        },
+        "modified": {
+          "name": "modified",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1,
+          "default": "false",
+          "mappedType": "boolean"
+        },
+        "test_id": {
+          "name": "test_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "start_time": {
+          "name": "start_time",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "end_time": {
+          "name": "end_time",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "test-runs",
+      "indexes": [
+        {
+          "columnNames": [
+            "test_id"
+          ],
+          "composite": false,
+          "keyName": "test-runs_test_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "test-runs_test_id_foreign": {
+          "constraintName": "test-runs_test_id_foreign",
+          "columnNames": [
+            "test_id"
+          ],
+          "localTableName": "test-runs",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "tests",
           "updateRule": "cascade"
         }
       },
@@ -429,6 +991,16 @@
           "length": 1,
           "default": "false",
           "mappedType": "boolean"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
         }
       },
       "name": "users",
@@ -444,6 +1016,16 @@
           "unique": true
         },
         {
+          "columnNames": [
+            "organization_id"
+          ],
+          "composite": false,
+          "keyName": "users_organization_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
           "keyName": "PRIMARY",
           "columnNames": [
             "id"
@@ -455,7 +1037,20 @@
         }
       ],
       "checks": [],
-      "foreignKeys": {},
+      "foreignKeys": {
+        "users_organization_id_foreign": {
+          "constraintName": "users_organization_id_foreign",
+          "columnNames": [
+            "organization_id"
+          ],
+          "localTableName": "users",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "organizations",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     }
   ],

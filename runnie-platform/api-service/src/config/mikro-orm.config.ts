@@ -17,7 +17,7 @@ const dbConfig = {
         path: './dist/database/migrations',
         pathTs: './src/database/migrations',
         tableName: 'migrations'
-      },
+    },
     extensions: [Migrator],
     debug: false,
 }

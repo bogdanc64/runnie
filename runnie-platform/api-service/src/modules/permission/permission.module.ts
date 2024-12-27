@@ -1,10 +1,10 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Module } from '@nestjs/common';
 import { PermissionService } from './permission.service';
-import { Permission } from 'src/database/entities/permission.entity';
+import { PermissionEntity } from 'src/database/entities/permission.entity';
 
 @Module({
-    imports: [MikroOrmModule.forFeature([Permission])],
+    imports: [MikroOrmModule.forFeature([PermissionEntity])],
     controllers: [],
     providers: [PermissionService],
     exports: [PermissionService]

@@ -8,6 +8,10 @@ import dbConfig from 'src/config/mikro-orm.config';
 import { appConfig, emailConfig } from '../config/config';
 import { UserModule } from 'src/modules/user/user.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { AssetModule } from 'src/modules/asset/asset.module';
+import { OrganizationModule } from 'src/modules/organization/organization.module';
+import { PermissionModule } from 'src/modules/permission/permission.module';
+import { RoleModule } from 'src/modules/role/role.module';
 
 @Module({
   imports: [
@@ -19,6 +23,10 @@ import { MailerModule } from '@nestjs-modules/mailer';
     MailerModule.forRoot(emailConfig),
     AuthModule,
     UserModule,
+    AssetModule,
+    OrganizationModule,
+    RoleModule,
+    PermissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

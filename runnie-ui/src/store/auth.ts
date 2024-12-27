@@ -26,6 +26,9 @@ export const useAuthStore = defineStore("auth", {
     getUserAvatar(): string | undefined {
       return this.authResponse?.avatar;
     },
+    getOrganizationName(): string | undefined {
+      return this.authResponse?.organization?.name;
+    },
     hasPermission(): (resource: PermissionResource, action: PermissionAction) => boolean {
       return (resource: PermissionResource, action: PermissionAction) => {
         return this.authResponse?.permissions[resource]?.some(permissionAction => permissionAction === action) ?? false;

@@ -6,7 +6,7 @@ import { PermissionAction, User } from 'runnie-common';
 import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
 import { PermissionGuard } from 'src/common/guards/permission.guard';
 
-@Controller('users')
+@Controller("users")
 @UseGuards(JwtAuthGuard, PermissionGuard)
 export class UserController {
     constructor(
@@ -16,10 +16,10 @@ export class UserController {
     @Get()
     @RequirePermission("users", PermissionAction.View)
     getUsers() {
-        return this.userService.getUsers();
+        return this.userService.list();
     }
 
-    @Patch('change-password')
+    @Patch("change-password")
     patchChangePassword(@CurrentUser() user: User, @Body() body: string): Promise<boolean> {
         // TODO: Implement this
         return new Promise(() => true);

@@ -27,7 +27,7 @@
     "pinia": "^2.1.7",
     "playwright": "^1.47.2",
     "radix-vue": "^1.9.6",
-    "runnie-common": "file:dependencies/runnie-common-1.0.0.tgz",
+    "runnie-common": "file:dependencies/runnie-common-1.0.1.tgz",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "vue": "^3.4.29",

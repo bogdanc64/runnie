@@ -1,9 +1,12 @@
+import { Organization } from "./organization";
+
 export interface AuthResponse {
-    user_id: number;
+    userId: number;
     fullName: string;
     email: string;
     role: string;
     avatar: string;
+    organization: Organization;
     permissions: { [key: string]: string[] };
 }
 
