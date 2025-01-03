@@ -30,6 +30,14 @@
     router.push({ name: "sign-in", replace: true });
   }
 
+  function selectAsset(assetId: string) {
+    assetStore.selectedAsset = assetStore.assets.find(asset => asset.id?.toString() === assetId) ?? null;
+  }
+
+  function createAsset() {
+    assetStore.isCreateAssetPopupOpen = true;
+  }
+
   function navigateToHome() {
     router.push({ path: "/", replace: true });
   }
@@ -60,7 +68,7 @@
         </nav>
       </SheetContent>
     </Sheet>
-    <AssetSelector :assets="assetStore.assets" />
+    <AssetSelector :assets="assetStore.assets" @select-asset="selectAsset" @create-asset="createAsset" />
     <div class="w-full flex-1"></div>
     <DarkModeToggle />
     <DropdownMenu>

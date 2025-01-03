@@ -2,6 +2,7 @@ import type { ApiClient, AuthResponse, PermissionAction, PermissionResource, Sig
 import { defineStore } from "pinia";
 import { useLoadingStore } from "./loading";
 import type { ResetPasswordDTO } from "runnie-common/dist/src/models/auth";
+import { useHydrateState } from "@/composables/useHydrateState";
 
 interface AuthState {
   authResponse: AuthResponse | null;
@@ -68,6 +69,7 @@ export const useAuthStore = defineStore("auth", {
 
     async signIn(data: SignInDTO): Promise<boolean> {
       const loadingStore = useLoadingStore();
+      const { hydrateState } = useHydrateState()
 
       try {
         loadingStore.setLoadingState("auth/sign-in", true);
@@ -75,6 +77,8 @@ export const useAuthStore = defineStore("auth", {
         const apiClient = (this as any).apiClient as ApiClient;
         const response = await apiClient.auth.signIn(data);
         this.setAuthResponse(response.data);
+
+        await hydrateState();
 
         return true;
       } catch (error) {
@@ -86,6 +90,7 @@ export const useAuthStore = defineStore("auth", {
 
     async refreshAuthTokens(): Promise<boolean> {
       const loadingStore = useLoadingStore();
+      const { hydrateState } = useHydrateState()
 
       try {
         loadingStore.setLoadingState("auth/sign-in", true);
@@ -93,6 +98,8 @@ export const useAuthStore = defineStore("auth", {
         const apiClient = (this as any).apiClient as ApiClient;
         const response = await apiClient.auth.refreshAuthTokens();
         this.setAuthResponse(response.data);
+
+        await hydrateState();
 
         return true;
       } catch (error) {

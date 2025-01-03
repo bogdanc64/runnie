@@ -18,7 +18,7 @@
     "@vee-validate/zod": "^4.13.2",
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.4",
-    "@vueuse/core": "^11.1.0",
+    "@vueuse/core": "^11.3.0",
     "bowser": "^2.11.0",
     "chrome-types": "^0.1.310",
     "class-variance-authority": "^0.7.0",

@@ -1,14 +1,14 @@
-import { IDataService, CRUDOptions, HttpStatusCodes, HttpMethods, ContentTypes } from "../models/data";
+import { IDataService, CRUDOptions, HttpMethods, ContentTypes } from "../models/data";
 
-export interface IResponse {
-    meta: any;
-    data: any;
+export interface Response<T> {
+    meta?: any;
+    data: T | null;
     status: number;
 }
 
 export class DataService implements IDataService {
     public apiUrl: string | undefined;
-    private headers: { [key: string]: string } = {};
+    private readonly headers: { [key: string]: string } = {};
 
     constructor(apiUrl?: string) {
         if (!apiUrl) return;
@@ -16,252 +16,137 @@ export class DataService implements IDataService {
         this.apiUrl = apiUrl;
     }
 
-    public async getBinary(path: string, id?: number): Promise<any> {
-        const url = id
-            ? `${this.getApiUrl()}${this.cleanPath(path)}/${id}`
-            : `${this.getApiUrl()}${this.cleanPath(path)}`;
-
-        try {
-            const response = await fetch(url, {
-                method: HttpMethods.GET,
-                headers: this.getHeaders(),
-                credentials: 'include',
-            })
-
-            return response.arrayBuffer();
-        } catch (error) {
-            throw error;
-        }
+    public async getBinary(path: string, id?: number): Promise<Response<any>> {
+        const url = id ? `${this.cleanPath(path)}/${id}` : this.cleanPath(path);
+        
+        return this.request(url, {
+            method: HttpMethods.GET,
+            opts: { contentType: ContentTypes.JSON },
+            isBinary: true,
+        });
     }
 
-    public async get(path: string, id?: number): Promise<any> {
-
+    public async get(path: string, id?: number): Promise<Response<any>  > {
         const url = id
             ? `${this.cleanPath(path)}/${id}`
             : `${this.cleanPath(path)}`;
 
-        const response = await this.request(url, {
+        return this.request(url, {
             method: HttpMethods.GET,
             opts: { contentType: ContentTypes.JSON },
         });
-
-        return response;
     }
 
-    public async list(path: string, id?: number): Promise<any> {
-        const url = id
-            ? `${this.getApiUrl()}${this.cleanPath(path)}/${id}`
-            : `${this.getApiUrl()}${this.cleanPath(path)}`;
-        const fullResponse = { status: 0, data: null };
+    public async list(path: string, id?: number): Promise<Response<any>> {
+        const url = id ? `${this.cleanPath(path)}/${id}` : this.cleanPath(path);
         
-        try {
-            const response = await fetch(url, {
-                method: HttpMethods.GET,
-                headers: this.getHeaders(),
-                credentials: 'include',
-            })
-            fullResponse.status = response.status;
-            if (fullResponse.status !== HttpStatusCodes.OK) throw fullResponse;
-
-            const data = await response.json();
-            fullResponse.data = data;
-
-            return fullResponse;
-        } catch (error) {
-            throw error;
-        }
+        return this.request(url, {
+            method: HttpMethods.GET,
+            opts: { contentType: ContentTypes.JSON },
+        });
     }
 
-    public async authMethod(path: string, entity: any, opts: CRUDOptions): Promise<any> {
-        const url = `${this.getApiUrl()}${this.cleanPath(path)}`;
-        const fullResponse = { status: 0, data: null };
-        const body = entity ? JSON.stringify(entity) : null;
-
-        try {
-            const response = await fetch(url, {
-                method: opts.method,
-                headers: this.getHeadersNew(opts),
-                credentials: 'include',
-                body,
-            })
-            fullResponse.status = response.status;
-            if (fullResponse.status !== HttpStatusCodes.OK) throw fullResponse;
-
-            const data = await response.json();
-            fullResponse.data = data;
-
-            return fullResponse;
-        } catch (error) {
-            throw error;
-        }
+    public async authMethod(path: string, entity: any, opts: CRUDOptions): Promise<Response<any>> {
+        const url = this.cleanPath(path);
+        
+        return this.request(url, {
+            method: opts.method as HttpMethods,
+            opts: opts,
+            body: entity ? JSON.stringify(entity) : null,
+        });
     }
 
-    public async create(path: string, entity: any, withFile?: boolean): Promise<any> {
-        const url = `${this.getApiUrl()}${this.cleanPath(path)}`;
-        const fullResponse = { status: 0, data: null };
-        let formData: FormData | undefined;
-
+    public async upsert(path: string, entity: any, withFile?: boolean): Promise<Response<any>> {
+        const url = `${this.cleanPath(path)}/upsert`;
+        let body: string | FormData;
+        
         if (withFile) {
-            formData = Object.keys(entity).reduce((fd, field) => {
+            body = Object.keys(entity).reduce((fd, field) => {
                 fd.append(field, entity[field]);
                 return fd;
             }, new FormData());
+        } else {
+            body = JSON.stringify(entity);
         }
-        try {
-            const response = await fetch(url, {
-                method: HttpMethods.POST,
-                headers: this.getHeaders(withFile),
-                body: withFile ? formData : JSON.stringify(entity),
-                credentials: 'include',
-            })
-            fullResponse.status = response.status;
-            if (fullResponse.status !== HttpStatusCodes.OK) throw fullResponse;
-
-            const data = await response.json();
-            fullResponse.data = data;
-
-            return fullResponse;
-        } catch (error) {
-            throw error;
-        }
+        
+        return this.request(url, {
+            method: HttpMethods.POST,
+            opts: { contentType: withFile ? undefined : ContentTypes.JSON },
+            body,
+        });
     }
 
-    public async update(path: string, entity: any, id?: number, opts?: CRUDOptions): Promise<any> {
+    public async create(path: string, payload: any, opts?: CRUDOptions): Promise<Response<any>> {
+        const url = `${this.cleanPath(path)}/create`;
+        
+        return this.request(url, {
+            method: HttpMethods.POST,
+            opts: opts ?? { contentType: ContentTypes.JSON },
+            body: JSON.stringify(payload),
+        });
+    }
+
+    public async update(path: string, payload: any, id?: number, opts?: CRUDOptions): Promise<Response<any>> {
         const url = id 
-         ? `${this.getApiUrl()}${this.cleanPath(path)}/${id}`
-         : `${this.getApiUrl()}${this.cleanPath(path)}`;
-
-        const headers: Headers = this.getHeadersNew(opts ?? { contentType: ContentTypes.JSON });
-        const fullResponse = { status: 0, data: null };
-
-        try {
-            const response = await fetch(url, {
-                method: HttpMethods.PUT,
-                headers,
-                body: JSON.stringify(entity),
-                credentials: 'include',
-            })
-            fullResponse.status = response.status;
-            if (fullResponse.status !== HttpStatusCodes.OK) throw fullResponse;
-
-            const data = await response.json();
-            fullResponse.data = data;
-
-            return fullResponse;
-        } catch (error) {
-            throw error;
-        }
+            ? `${this.cleanPath(path)}/update/${id}`
+            : `${this.cleanPath(path)}/update`;
+        
+        return this.request(url, {
+            method: HttpMethods.PUT,
+            opts: opts ?? { contentType: ContentTypes.JSON },
+            body: JSON.stringify(payload),
+        });
     }
 
-    public async delete(path: string, id?: number): Promise<any> {
-        const url = id
-            ? `${this.getApiUrl()}${this.cleanPath(path)}/${id}`
-            : `${this.getApiUrl()}${this.cleanPath(path)}`;
-        const fullResponse = { status: 0, data: null };
-
-        try {
-            const response = await fetch(url, {
-                method: HttpMethods.DELETE,
-                headers: this.getHeaders(),
-            })
-            fullResponse.status = response.status;
-            if (fullResponse.status !== HttpStatusCodes.OK) throw fullResponse;
-
-            const data = await response.json();
-            fullResponse.data = data;
-
-            return fullResponse;
-        } catch (error) {
-            throw error;
-        }
+    public async delete(path: string, id?: number): Promise<Response<any>> {
+        const url = id ? `${this.cleanPath(path)}/${id}` : this.cleanPath(path);
+        
+        return this.request(url, {
+            method: HttpMethods.DELETE,
+            opts: { contentType: ContentTypes.JSON },
+        });
     }
 
-    public async getRaw(path: string, id?: number): Promise<any> {
+    public async getRaw(path: string, id?: number): Promise<Response<any>> {
         const cleanPath = this.cleanPath(path);
-        const baseUrl = !this.isCompletePath(cleanPath) 
-            ? this.getApiUrl()
-            : cleanPath;
+        const baseUrl = !this.isCompletePath(cleanPath) ? '' : cleanPath;
         const url = id
             ? `${baseUrl}${this.cleanPath(path)}/${id}`
             : `${baseUrl}${this.cleanPath(path)}`;
-
-        try {
-            const response = await fetch(url, {
-                method: HttpMethods.GET,
-                headers: this.getHeaders(),
-                credentials: 'include',
-            });
-
-            const contentType = response.headers.get("content-type");
-            if (contentType?.includes(ContentTypes.JSON)) {
-                return response.json();
-            } else if (contentType?.includes(ContentTypes.Sheet)) {
-                return response.arrayBuffer();
-            } else {
-                return response.text();
-            }
-        } catch (error) {
-            throw error;
-        }
+        
+        return this.request(url, {
+            method: HttpMethods.GET,
+            opts: { contentType: ContentTypes.JSON },
+        });
     }
 
-    public async upload(path: string, data: any, id?: number) {
-        const url = id
-            ? `${this.getApiUrl()}${this.cleanPath(path)}/${id}`
-            : `${this.getApiUrl()}${this.cleanPath(path)}`;
-
+    public async upload(path: string, data: any, id?: number): Promise<Response<any>> {
+        const url = id ? `${this.cleanPath(path)}/${id}` : this.cleanPath(path);
+        
         const formData = Object.keys(data).reduce((fd, field) => {
             fd.append(field, data[field]);
             return fd;
         }, new FormData());
-
-        const fullResponse = { status: 0, data: null };
-
-        try {
-            const response = await fetch(url, {
-                method: HttpMethods.PUT,
-                headers: this.getHeaders(true),
-                body: formData,
-                credentials: 'include',
-            })
-            fullResponse.status = response.status;
-            if (fullResponse.status !== HttpStatusCodes.OK) throw fullResponse;
-
-            const data = await response.json();
-            fullResponse.data = data;
-
-            return fullResponse;
-        } catch (error) {
-            throw error;
-        }
+        
+        return this.request(url, {
+            method: HttpMethods.PUT,
+            opts: {},
+            body: formData,
+        });
     }
 
-    public async uploadFile(path: string, data: any) {
-        const url = `${this.getApiUrl()}${this.cleanPath(path)}`;
-
+    public async uploadFile(path: string, data: any): Promise<Response<any>> {
+        const url = this.cleanPath(path);
+        
         const formData = new FormData();
         formData.append("upload", data.file);
         formData.append("data", JSON.stringify(data.script));
-        const fullResponse = { status: 0, data: null };
-
-        try {
-            const response = await fetch(url, {
-                method: HttpMethods.PATCH,
-                headers: this.getHeadersNew({}),
-                body: formData,
-                credentials: 'include',
-            })
-
-            fullResponse.status = response.status;
-            if (fullResponse.status !== HttpStatusCodes.OK) throw fullResponse;
-
-            const data = await response.json();
-            fullResponse.data = data;
-
-            return fullResponse;
-        } catch (error) {
-            throw error;
-        }
+        
+        return this.request(url, {
+            method: HttpMethods.PATCH,
+            opts: {},
+            body: formData,
+        });
     }
 
     private getApiUrl(): string {
@@ -276,37 +161,23 @@ export class DataService implements IDataService {
             method: HttpMethods;
             opts: CRUDOptions;
             body?: any;
+            isBinary?: boolean;
         }
-    ): Promise<any> {
+    ): Promise<Response<any>> {
         const url = `${this.getApiUrl()}${path}`;
 
         const options: RequestInit = {
             method: config.method,
             headers: this.getHeadersNew(config.opts),
+            credentials: 'include',
         };
 
-        if (config.body && (
-            config.method === HttpMethods.PUT || 
-            config.method === HttpMethods.PATCH || 
-            config.method === HttpMethods.POST
-        )) {
+        if (config.body) {
             options.body = config.body;
         }
-        const response = { status: 0, message: null };
 
-        try {
-            const fetchedResponse = await fetch(url, options);
-            const json = await fetchedResponse.json();
-
-            response.status = fetchedResponse.status;
-            response.message = json.data ?? json.message;
-
-            if (!fetchedResponse.ok) throw response;
-
-            return response;
-        } catch (error) {
-            throw error;
-        }
+        const fetchedResponse = await fetch(url, options);
+        return this.handleResponse(fetchedResponse, config.isBinary);
     }
 
     private getHeadersNew(opts: CRUDOptions): Headers {
@@ -339,5 +210,19 @@ export class DataService implements IDataService {
         path = path.startsWith("/") ? path.slice(1) : path;
         path = path.endsWith("/") ? path.slice(0, -1) : path;
         return path;
+    }
+
+    private async handleResponse(response: globalThis.Response, isBinary: boolean = false): Promise<Response<any>> {
+        const fullResponse = { 
+            status: response.status,
+            data: null
+        };
+
+        if (!response.ok) return fullResponse;
+
+        const data = isBinary ? await response.arrayBuffer() : await response.json();
+        fullResponse.data = data;
+
+        return fullResponse;
     }
 }

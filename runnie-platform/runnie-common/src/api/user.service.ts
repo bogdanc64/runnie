@@ -4,6 +4,6 @@ import { DataService } from "./data.service";
 
 export class UserService extends BaseService<User> {
     constructor(readonly dataService: DataService) {
-        super("/users", "users", dataService);
+        super("/users", dataService);
     }
 }
