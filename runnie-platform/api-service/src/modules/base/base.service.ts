@@ -33,11 +33,29 @@ export class BaseService<Entity extends BaseEntity> {
 
     async delete(id: number): Promise<void> {
         const entity = await this.findOne(id);
-        if (!entity) return;
+        if (!entity) {
+            return;
+        }
 
         entity.deleted = true;
-        entity.modified = new Date();
         await this.em.persistAndFlush(entity);
+    }
+
+    async create(data: Partial<Entity>): Promise<Entity> {
+        const entity = this.repository.create(data, { partial: true });
+        await this.em.persistAndFlush(entity);
+        return entity;
+    }
+
+    async update(id: number, data: Partial<Entity>): Promise<Entity> {
+        const entity = await this.findOne(id);
+        if (!entity) {
+            return null;
+        }
+        
+        Object.assign(entity, data);
+        await this.em.persistAndFlush(entity);
+        return entity;
     }
 
     async upsert(data: Partial<Entity>): Promise<Entity> {

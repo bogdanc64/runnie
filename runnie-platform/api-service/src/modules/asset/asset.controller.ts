@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { Asset, PermissionAction } from 'runnie-common';
 import { RequirePermission } from 'src/common/decorators/require-permission.decorator';
@@ -19,9 +19,21 @@ export class AssetController {
         return this.assetService.list();
     }
 
-    @Post("upsert")
+    @Post("create")
     @RequirePermission("assets", PermissionAction.Create)
-    postUpsertAsset(@Body() asset: Asset) {
-        return this.assetService.upsert(asset as Partial<AssetEntity>);
+    async postCreateAsset(@Body() asset: Asset) {
+        return this.assetService.createAsset(asset);
+    }
+
+    @Put("update")
+    @RequirePermission("assets", PermissionAction.Update)
+    async putUpdateAsset(@Body() asset: Asset) {
+        return this.assetService.update(asset.id, asset as AssetEntity);
+    }
+
+    @Delete(':id')
+    @RequirePermission("assets", PermissionAction.Delete)
+    async delete(@Param('id') id: number): Promise<void> {
+        return this.assetService.delete(id);
     }
 }

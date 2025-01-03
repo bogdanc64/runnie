@@ -1,12 +1,12 @@
 import { AuthResponse, ResetPasswordDTO, SignInDTO, SignUpDTO } from "../models/auth";
-import { ContentTypes, HttpMethods, HttpResponse } from "../models/data";
+import { ContentTypes, HttpMethods, Response } from "../models/data";
 import { DataService } from "./data.service";
 
 export class AuthService {
 
     constructor(readonly dataService: DataService) {}
 
-    public signIn(data: SignInDTO): Promise<HttpResponse<AuthResponse>> {
+    public signIn(data: SignInDTO): Promise<Response<AuthResponse>> {
         return this.dataService.authMethod(
             "auth/sign-in",
             data,
@@ -14,7 +14,7 @@ export class AuthService {
         );
     }
 
-    public async  refreshAuthTokens(): Promise<HttpResponse<AuthResponse>> {
+    public async refreshAuthTokens(): Promise<Response<AuthResponse>> {
         return this.dataService.authMethod(
             "auth/refresh",
             { },
@@ -22,7 +22,7 @@ export class AuthService {
         );
     }
 
-    public async signUp(data: SignUpDTO): Promise<HttpResponse<AuthResponse>> {
+    public async signUp(data: SignUpDTO): Promise<Response<AuthResponse>> {
         return this.dataService.authMethod(
             "auth/sign-up",
             data,
@@ -38,7 +38,7 @@ export class AuthService {
         );
     }
 
-    public async verifyEmail(token: string): Promise<HttpResponse<boolean>> {
+    public async verifyEmail(token: string): Promise<Response<boolean>> {
         return this.dataService.authMethod(
             `auth/verify-email?token=${token}`,
             { },
@@ -46,7 +46,7 @@ export class AuthService {
         );
     }
 
-    public async requestResetPassword(email: string): Promise<HttpResponse<boolean>> {
+    public async requestResetPassword(email: string): Promise<Response<boolean>> {
         return this.dataService.authMethod(
             `auth/request-reset-password`,
             { email },
@@ -54,7 +54,7 @@ export class AuthService {
         );
     }
 
-    public async resetPassword(data: ResetPasswordDTO): Promise<HttpResponse<boolean>> {
+    public async resetPassword(data: ResetPasswordDTO): Promise<Response<boolean>> {
         return this.dataService.authMethod(
             `auth/reset-password`,
             data,

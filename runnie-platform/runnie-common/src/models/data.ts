@@ -1,12 +1,9 @@
-import { AuthResponse, TokenType } from "./auth";
-
 export interface IDataService {
     upload: (path: string, data: any, id?: number, opts?: CRUDOptions) => Promise<any>;
     uploadFile: (path: string, data: any) => Promise<any>;
     get: (path: string, id?: number) => Promise<any>;
-    list: (path: string, id?: number) => Promise<any[]>;
-    create: (path: string, entity: any) => Promise<any>;
-    update: (path: string, entity: any, id?: number, opts?: CRUDOptions) => Promise<any>;
+    list: (path: string, id?: number) => Promise<any>;
+    upsert: (path: string, entity: any) => Promise<any>;
     delete: (path: string, id?: number) => Promise<any>;
     getRaw: (path: string, id?: number) => Promise<any>;
     getBinary: (path: string, id?: number) => Promise<any>;
@@ -19,14 +16,15 @@ export interface CRUDOptions {
     method?: string;
 }
 
-export interface HttpResponse<T> {
-    status: HttpStatusCodes,
-    data: T,
-    meta: any
+export interface Response<T> {
+    meta?: any;
+    data: T | null;
+    status: number;
 }
 
 export enum HttpStatusCodes {
     OK = 200,
+    CREATED = 201,
     UNAUTHORIZED = 401,
     FORBIDDEN = 403
 }

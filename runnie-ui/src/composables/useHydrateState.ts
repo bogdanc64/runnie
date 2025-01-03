@@ -1,12 +1,17 @@
-import { onMounted } from 'vue'
+import { ref } from 'vue'
 import { useAssetStore } from '@/store/asset'
 
 export function useHydrateState() {
   const assetStore = useAssetStore()
+  const hasHydrated = ref(false)
   
-  onMounted(async () => {
-    await Promise.all([
-      assetStore.fetchAssets(),
-    ])
-  })
+  const hydrateState = async () => {
+    if (hasHydrated.value) return
+    await assetStore.fetchAssets()
+    hasHydrated.value = true
+  }
+
+  return {
+    hydrateState
+  }
 }
