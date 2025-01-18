@@ -40,15 +40,15 @@
       return;
     }
 
-    navigateToDashboard();
+    navigateToAssets();
   }
 
   function handleOTPSubmit() {
-    navigateToDashboard();
+    navigateToAssets();
   }
 
-  function navigateToDashboard() {
-    router.push({ name: "dashboard", replace: true });
+  function navigateToAssets() {
+    router.push({ name: "assets", replace: true });
   }
 
   function navigateToSignIn() {

@@ -76,11 +76,14 @@ export const useAuthStore = defineStore("auth", {
 
         const apiClient = (this as any).apiClient as ApiClient;
         const response = await apiClient.auth.signIn(data);
-        this.setAuthResponse(response.data);
+        if (response.data) {
+          this.setAuthResponse(response.data);
+          await hydrateState();
 
-        await hydrateState();
+          return true;
+        }
 
-        return true;
+        return false;
       } catch (error) {
         return false;
       } finally {
@@ -97,11 +100,15 @@ export const useAuthStore = defineStore("auth", {
 
         const apiClient = (this as any).apiClient as ApiClient;
         const response = await apiClient.auth.refreshAuthTokens();
-        this.setAuthResponse(response.data);
 
-        await hydrateState();
+        if (response.data) {
+          this.setAuthResponse(response.data);
+          await hydrateState();
 
-        return true;
+          return true;
+        }
+
+        return false;
       } catch (error) {
         return false;
       } finally {

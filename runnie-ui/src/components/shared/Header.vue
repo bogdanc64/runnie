@@ -68,7 +68,14 @@
         </nav>
       </SheetContent>
     </Sheet>
-    <AssetSelector :assets="assetStore.assets" @select-asset="selectAsset" @create-asset="createAsset" />
+    <template v-if="assetStore.selectedAsset">
+      <AssetSelector
+        :assets="assetStore.assets"
+        :selected-asset="assetStore.selectedAsset"
+        @select-asset="selectAsset"
+        @create-asset="createAsset"
+      />
+    </template>
     <div class="w-full flex-1"></div>
     <DarkModeToggle />
     <DropdownMenu>

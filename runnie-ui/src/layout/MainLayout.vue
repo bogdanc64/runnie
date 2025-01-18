@@ -20,7 +20,7 @@
 
 <template>
   <div class="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-    <SideMenu />
+    <SideMenu :is-asset-selected="!!assetStore.selectedAsset" />
     <div class="flex flex-col">
       <Header />
       <template v-if="assetStore.isCreateAssetPopupOpen">

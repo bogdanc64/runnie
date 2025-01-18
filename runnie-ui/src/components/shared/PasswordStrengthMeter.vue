@@ -1,11 +1,11 @@
 <script setup lang="ts">
   import { computed } from "vue";
 
-  export interface Props {
+  interface Props {
     passwordScore: number;
   }
-
   const props = defineProps<Props>();
+
   const barColor = computed(() => (index: number) => {
     if (index - 1 >= props.passwordScore) {
       return "bg-gray-200 dark:bg-gray-800";
