@@ -82,7 +82,6 @@
             <div class="w-full flex justify-end">
               <Button @click="$emit('close')" type="button" variant="outline" class="me-5">Cancel</Button>
               <Button
-                type="button"
                 class="mt-0"
                 @click="createAsset"
                 :is-loading="loadingStore.isLoading('asset/create')"

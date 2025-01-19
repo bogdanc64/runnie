@@ -3,15 +3,16 @@
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator } from "../ui/select";
   import { Icon } from "@iconify/vue";
 
-  export interface Props {
+  interface Props {
     assets: Asset[];
+    selectedAsset: Asset;
   }
   const props = defineProps<Props>();
 </script>
 
 <template>
   <div class="space-y-2">
-    <Select @update:modelValue="$emit('select-asset', $event)">
+    <Select :modelValue="props.selectedAsset?.id?.toString()" @update:modelValue="$emit('select-asset', $event)">
       <SelectTrigger
         class="[&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 [&>span_svg]:text-muted-foreground/80"
       >
